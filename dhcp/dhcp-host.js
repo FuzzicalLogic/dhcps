@@ -119,22 +119,22 @@ function sendMessage(pkt, port, host, cb) {
 }
 
 
-DHCPHost.prototype.createPacket = function(pkt) {
-    if (!('xid' in pkt))
-        throw new Error('pkt.xid required');
+DHCPHost.prototype.createPacket = function(msg) {
+    if (!('xid' in msg))
+        throw new Error('msg.xid required');
 
-    var ci = new Buffer(('ciaddr' in pkt) ?
-        new V4Address(pkt.ciaddr).toArray() : [0, 0, 0, 0]);
-    var yi = new Buffer(('yiaddr' in pkt) ?
-        new V4Address(pkt.yiaddr).toArray() : [0, 0, 0, 0]);
-	var si = new Buffer(('siaddr' in pkt) ?
-        new V4Address(pkt.siaddr).toArray() : [0, 0, 0, 0]);
-    var gi = new Buffer(('giaddr' in pkt) ?
-        new V4Address(pkt.giaddr).toArray() : [0, 0, 0, 0]);
+    var ci = new Buffer(('ciaddr' in msg) ?
+        new V4Address(msg.ciaddr).toArray() : [0, 0, 0, 0]);
+    var yi = new Buffer(('yiaddr' in msg) ?
+        new V4Address(msg.yiaddr).toArray() : [0, 0, 0, 0]);
+	var si = new Buffer(('siaddr' in msg) ?
+        new V4Address(msg.siaddr).toArray() : [0, 0, 0, 0]);
+    var gi = new Buffer(('giaddr' in msg) ?
+        new V4Address(msg.giaddr).toArray() : [0, 0, 0, 0]);
 
-    if (!('chaddr' in pkt))
+    if (!('chaddr' in msg))
         throw new Error('pkt.chaddr required');
-    var hw = new Buffer(pkt.chaddr.address.split(':').map(function(part) {
+    var hw = new Buffer(msg.chaddr.address.split(':').map(function(part) {
         return parseInt(part, 16);
     }));
     if (hw.length !== 6)
@@ -143,13 +143,13 @@ DHCPHost.prototype.createPacket = function(pkt) {
     var p = new Buffer(1500);
     var i = 0;
 
-    p.writeUInt8(pkt.op,    i++);
-    p.writeUInt8(pkt.htype, i++);
-    p.writeUInt8(pkt.hlen,  i++);
-    p.writeUInt8(pkt.hops,  i++);
-    p.writeUInt32BE(pkt.xid,   i); i += 4;
-    p.writeUInt16BE(pkt.secs,  i); i += 2;
-    p.writeUInt16BE(pkt.flags, i); i += 2;
+    p.writeUInt8(msg.op,    i++);
+    p.writeUInt8(msg.htype, i++);
+    p.writeUInt8(msg.hlen,  i++);
+    p.writeUInt8(msg.hops,  i++);
+    p.writeUInt32BE(msg.xid,   i); i += 4;
+    p.writeUInt16BE(msg.secs,  i); i += 2;
+    p.writeUInt16BE(msg.flags, i); i += 2;
     ci.copy(p, i); i += ci.length;
     yi.copy(p, i); i += yi.length;
     si.copy(p, i); i += si.length;
@@ -159,26 +159,26 @@ DHCPHost.prototype.createPacket = function(pkt) {
     p.fill(0, i, i + 192); i += 192;
     p.writeUInt32BE(0x63825363, i); i += 4;
 
-    if (pkt.options && 'requestedIpAddress' in pkt.options) {
+    if (msg.options && 'requestedIpAddress' in msg.options) {
         p.writeUInt8(50, i++); // option 50
         var requestedIpAddress = new Buffer(
-            new v4.Address(pkt.options.requestedIpAddress).toArray());
+            new v4.Address(msg.options.requestedIpAddress).toArray());
         p.writeUInt8(requestedIpAddress.length, i++);
         requestedIpAddress.copy(p, i); i += requestedIpAddress.length;
     }
-    if (pkt.options && 'dhcpMessageType' in pkt.options) {
+    if (msg.options && 'dhcpMessageType' in pkt.options) {
         p.writeUInt8(53, i++); // option 53
         p.writeUInt8(1, i++);  // length
         p.writeUInt8(pkt.options.dhcpMessageType, i++);
     }
-    if (pkt.options && 'serverIdentifier' in pkt.options) {
+    if (msg.options && 'serverIdentifier' in pkt.options) {
         p.writeUInt8(54, i++); // option 54
         var serverIdentifier = new Buffer(
-            new v4.Address(pkt.options.serverIdentifier).toArray());
+            new v4.Address(msg.options.serverIdentifier).toArray());
         p.writeUInt8(serverIdentifier.length, i++);
         serverIdentifier.copy(p, i); i += serverIdentifier.length;
     }
-    if (pkt.options && 'parameterRequestList' in pkt.options) {
+    if (msg.options && 'parameterRequestList' in msg.options) {
         p.writeUInt8(55, i++); // option 55
         var parameterRequestList = new Buffer(pkt.options.parameterRequestList);
         if (parameterRequestList.length > 16)
@@ -186,8 +186,8 @@ DHCPHost.prototype.createPacket = function(pkt) {
         p.writeUInt8(parameterRequestList.length, i++);
         parameterRequestList.copy(p, i); i += parameterRequestList.length;
     }
-    if (pkt.options && 'clientIdentifier' in pkt.options) {
-        var clientIdentifier = new Buffer(pkt.options.clientIdentifier);
+    if (msg.options && 'clientIdentifier' in msg.options) {
+        var clientIdentifier = new Buffer(msg.options.clientIdentifier);
         var optionLength = 1 + clientIdentifier.length;
         if (optionLength > 0xff)
             throw new Error('pkt.options.clientIdentifier malformed');
