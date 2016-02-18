@@ -180,7 +180,7 @@ DHCPHost.prototype.createPacket = function(msg) {
     }
     if (msg.options && 'parameterRequestList' in msg.options) {
         p.writeUInt8(55, i++); // option 55
-        var parameterRequestList = new Buffer(pkt.options.parameterRequestList);
+        var parameterRequestList = new Buffer(msg.options.parameterRequestList);
         if (parameterRequestList.length > 16)
             throw new Error('pkt.options.parameterRequestList malformed');
         p.writeUInt8(parameterRequestList.length, i++);
