@@ -1,8 +1,11 @@
-var DHCPA;
-module.exports = (namespace) => {
-	DHCPA = 'object' === typeof namespace
+"use strict";
+var __NAMESPACE__,
+	Enum;
+module.exports = (namespace, EnumClass) => {
+	__NAMESPACE__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
+	Enum = EnumClass;
 
 	return {
 	    createHardwareAddress: createHardwareAddress,

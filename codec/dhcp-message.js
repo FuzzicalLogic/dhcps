@@ -1,9 +1,11 @@
 "use strict";
-module.exports = (namespace, enumClass) => {
-	DHCPA = 'object' === typeof namespace
+var __NAMESPACE__,
+	Enum;
+module.exports = (namespace, EnumClass) => {
+	__NAMESPACE__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
-	Enum = enumClass;
+	Enum = EnumClass;
 
 
 	DHCPAMessage.TYPES = Object.freeze(new Enum()
@@ -18,8 +20,6 @@ module.exports = (namespace, enumClass) => {
 
 	return DHCPAMessage;
 }
-var DHCPA;
-var Enum;
 var assert = require('assert');
 
 function DHCPAMessage() {
@@ -143,7 +143,7 @@ function decodeMessage(msg, rinfo) {
 	//console.log(rinfo.address + ':' + rinfo.port + '/' + msg.length + 'b');
 
     var p = {
-        op: DHCPA.protocol.BOOTPMessageType.get(msg.readUInt8(0)),
+        op: __NAMESPACE__.protocol.BOOTPMessageType.get(msg.readUInt8(0)),
         // htype is combined into chaddr field object
         hlen: msg.readUInt8(2),
         hops: msg.readUInt8(3),
@@ -154,8 +154,8 @@ function decodeMessage(msg, rinfo) {
         yiaddr: readIpRaw(msg, 16),
         siaddr: readIpRaw(msg, 20),
         giaddr: readIpRaw(msg, 24),
-        chaddr: DHCPA.protocol.createHardwareAddress(
-                    DHCPA.protocol.ARPHardwareType.get(msg.readUInt8(1)),
+        chaddr: __NAMESPACE__.protocol.createHardwareAddress(
+                    __NAMESPACE__.protocol.ARPHardwareType.get(msg.readUInt8(1)),
                     readAddressRaw(msg, 28, msg.readUInt8(2))),
         sname: trimNulls(msg.toString('ascii', 44, 108)),
         file: trimNulls(msg.toString('ascii', 108, 236)),
@@ -303,8 +303,8 @@ function decodeMessage(msg, rinfo) {
             case 61: {          // clientIdentifier
                 var len = msg.readUInt8(offset++);
                 p.options.clientIdentifier =
-                    DHCPA.protocol.createHardwareAddress(
-                        DHCPA.protocol.ARPHardwareType.get(msg.readUInt8(offset)),
+                    __NAMESPACE__.protocol.createHardwareAddress(
+                        __NAMESPACE__.protocol.ARPHardwareType.get(msg.readUInt8(offset)),
                         readAddressRaw(msg, offset + 1, len - 1));
                 offset += len;
                 break;

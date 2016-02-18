@@ -1,36 +1,34 @@
 "use strict";
-module.exports = (namespace, Host) => {
-	DHCPA = 'object' === typeof namespace
+var __NAMESPACE__, __SUPER__;
+module.exports = (namespace, ParentClass) => {
+	__NAMESPACE__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
-	DHCPHost = 'function' === typeof Host
-		? Host
+	__SUPER__ = 'function' === typeof ParentClass
+		? ParentClass
 		: () => {};
-	util.inherits(DHCPAClient, DHCPHost);
+	util.inherits(DHCPSClient, __SUPER__);
 
-	return DHCPAClient;
+	return DHCPSClient;
 }
-var DHCPA, DHCPHost;
 
-var EventEmitter = require('events').EventEmitter;
 var util = require('util');
-var dgram = require('dgram');
 var V4Address = require('ip-address').Address4;
 var hex = require('hex');
 
-function DHCPAClient(options) {
+function DHCPSClient(options) {
 	options = options || { };
 	options.address = options.address || '127.0.0.1';
 	options.port = options.port || 68;
 
-	DHCPHost.call(this, options);
+	__SUPER__.call(this, options);
 }
 
-DHCPAClient.prototype.broadcast = function(pkt, cb) {
+DHCPSClient.prototype.broadcast = function(pkt, cb) {
 	DCHPHost.prototype.broadcast.call(this, pkt, cb);
 }
 
-DHCPAClient.prototype.createPacket = function(pkt) {
+DHCPSClient.prototype.createPacket = function(pkt) {
     if (!('xid' in pkt))
         throw new Error('pkt.xid required');
 
@@ -127,7 +125,7 @@ DHCPAClient.prototype.createPacket = function(pkt) {
     return p.slice(0, i);
 }
 
-DHCPAClient.prototype.createDiscoverPacket = function(user) {
+DHCPSClient.prototype.createDiscoverPacket = function(user) {
     var pkt = {
         op:     0x01,
         htype:  0x01,
@@ -148,22 +146,22 @@ DHCPAClient.prototype.createDiscoverPacket = function(user) {
 	return this.createPacket(pkt);
 }
 
-DHCPAClient.prototype.createRequestPacket = function(msg) {
-	msg.options.dhcpMessageType = DHCPA.Message.TYPES.DHCP_REQUEST.value;
+DHCPSClient.prototype.createRequestPacket = function(msg) {
+	msg.options.dhcpMessageType = __NAMESPACE__.Message.TYPES.DHCP_REQUEST.value;
     return this.createPacket(msg);
 }
 
-DHCPAClient.prototype.createDeclinePacket = function(msg) {
-	msg.options.dhcpMessageType = DHCPA.Message.TYPES.DHCP_DECLINE.value;
+DHCPSClient.prototype.createDeclinePacket = function(msg) {
+	msg.options.dhcpMessageType = __NAMESPACE__.Message.TYPES.DHCP_DECLINE.value;
     return this.createPacket(msg);
 }
 
-DHCPAClient.prototype.createReleasePacket = function(msg) {
-	msg.options.dhcpMessageType = DHCPA.Message.TYPES.DHCP_RELEASE.value;
+DHCPSClient.prototype.createReleasePacket = function(msg) {
+	msg.options.dhcpMessageType = __NAMESPACE__.Message.TYPES.DHCP_RELEASE.value;
     return this.createPacket(msg);
 }
 
-/*DHCPAClient.prototype.send = function(pkt, port, host, cb) {
-	console.log('Sending Packet to:' + host + ':' + port);
-	this.client.send(pkt, 0, pkt.length, port, host, cb);
+/*DHCPSClient.prototype.send = function(pkt, port, ParentClass, cb) {
+	console.log('Sending Packet to:' + ParentClass + ':' + port);
+	this.client.send(pkt, 0, pkt.length, port, ParentClass, cb);
 }*/

@@ -6,7 +6,7 @@ var __NAMESPACE__  = Object.create(null),
     DCHPS = __NAMESPACE__;
 
 var Enum = require('./util/enum');
-__NAMESPACE__.protocol = require('./codec/protocol')(__NAMESPACE__);
+__NAMESPACE__.protocol = require('./codec/protocol')(__NAMESPACE__, Enum);
 __NAMESPACE__.MessageOption = require('./codec/dhcp-message-option')(__NAMESPACE__);
 __NAMESPACE__.Message = require('./codec/dhcp-message')(__NAMESPACE__, Enum);
 __NAMESPACE__.DHCP = {};

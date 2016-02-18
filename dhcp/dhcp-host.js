@@ -1,12 +1,13 @@
 "use strict";
+var __NAMESPACE__;
 module.exports = (namespace) => {
-	DHCPA = 'object' === typeof namespace
+	__NAMESPACE__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
 
 	return DHCPHost;
 }
-var DHCPA;
+
 var attribute = require('attribute');
 var SYSTEM_BROADCAST_ADDRESS = '127.255.255.255',
 	LOCALAREA_BROADCAST_ADDRESS = '192.255.255.255';
@@ -55,11 +56,11 @@ function DHCPHost(opts) {
 
     this.socket = dgram.createSocket('udp4');
     this.socket.on('message', (pkt, rinfo) => {
-		var msg = DHCPA.Message.decode(pkt, rinfo);
+		var msg = __NAMESPACE__.Message.decode(pkt, rinfo);
     	this.emit('message', rinfo, msg);
 
 		console.log('DHCP/A Message received from: ' + rinfo.address + ':' + rinfo.port );
-		var type = DHCPA.Message.TYPES.get(msg.options.dhcpMessageType);
+		var type = __NAMESPACE__.Message.TYPES.get(msg.options.dhcpMessageType);
 		if (!!type) {
 			var event = type.name.toLowerCase().replace('dhcp_', '');
 			this.emit(event, rinfo, msg);

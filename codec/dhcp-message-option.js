@@ -1,12 +1,12 @@
 "use strict";
-module.exports = (ns) => {
-	DHCPA = 'object' === typeof namespace
+var __NAMESPACE__;
+module.exports = (namespace) => {
+	__NAMESPACE__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
 
 	return DHCPAMessageOption;
 }
-var DHCPA;
 
 function DHCPAMessageOption(key, value, type) {
 
