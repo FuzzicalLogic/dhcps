@@ -25,7 +25,7 @@ function DHCPSClient(options) {
 }
 
 DHCPSClient.prototype.broadcast = function(pkt, cb) {
-	DCHPHost.prototype.broadcast.call(this, pkt, cb);
+	__SUPER__.prototype.broadcast.call(this, pkt, cb);
 }
 
 DHCPSClient.prototype.createPacket = function(pkt) {
