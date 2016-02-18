@@ -3,7 +3,7 @@ module.exports = () => {
 	return DHCPS;
 }
 var __NAMESPACE__  = Object.create(null),
-    DCHPS = __NAMESPACE__;
+    DHCPS = __NAMESPACE__;
 
 var Enum = require('./util/enum');
 __NAMESPACE__.protocol = require('./codec/protocol')(__NAMESPACE__, Enum);
