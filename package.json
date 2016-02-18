@@ -1,10 +1,10 @@
 {
-  "name": "dchps",
+  "name": "dhcps",
   "productName": "DHCP for Software Services",
   "version": "v0.1.0",
 
   "main": "index.js",
-  
+
   "dependencies": {
     "attribute": "fuzzicallogic/js-attributes"
   },
