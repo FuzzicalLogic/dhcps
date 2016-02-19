@@ -93,9 +93,8 @@ DHCPHost.prototype.bind = function(callback) {
     });
 }
 
-function startServer(host, port) {
-	if (!port) port = 67;
-    this.socket.bind(port, this.address());
+function startServer(callback) {
+	this.bind(callback);
 }
 
 function broadcastMessage(msg, callback) {

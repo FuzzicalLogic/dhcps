@@ -24,6 +24,18 @@ function DHCPSClient(options) {
 	__SUPER__.call(this, options);
 }
 
+DHCPSClient.prototype.start = function(callback) {
+	__SUPER__.prototype.start.call(() => {
+		this.broadcast(
+			this.createDiscoverPacket(),
+			__SUPER__.SYSTEM_BROADCAST_ADDRESS
+		);
+
+		if (typeof callback === 'function')
+			callback();
+	});
+}
+
 DHCPSClient.prototype.broadcast = function(pkt, cb) {
 	__SUPER__.prototype.broadcast.call(this, pkt, cb);
 }
