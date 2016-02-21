@@ -1,9 +1,13 @@
 "use strict";
-var __NAMESPACE__, __SUPER__;
+var __NAMESPACE__, __SUPER__, Message, MSGTYPES;
+
 module.exports = (namespace, ParentClass) => {
 	__NAMESPACE__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
+	Message = __NAMESPACE__.Message;
+	MSGTYPES = Message.TYPES;
+
 	__SUPER__ = 'function' === typeof ParentClass
 		? ParentClass
 		: () => {};
@@ -16,6 +20,7 @@ var util = require('util');
 
 function DHCPSServer(options) {
 	options = options || { };
+	options.hostname = options.hostname || 'dhcps.ntmobiledev.local';
 	options.address = options.address || '127.0.0.1';
 	options.port = options.port || 67;
 
