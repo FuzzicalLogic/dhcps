@@ -23,18 +23,19 @@ module.exports = (namespace, EnumClass) => {
 var assert = require('assert');
 
 function DHCPAMessage() {
+	this.xid = xid || 0x00000001;
+
 	this.op = 0x01;
-	this.htype = 0;
-	this.hlen = 0;
-	this.hops = 0;
-	this.xid = 0;
-	this.secs = 0;
-	this.flags = 0;
+	this.htype = 0x01;
+	this.hlen = 0x06;
+	this.hops = 0x00;
+	this.secs = 0x0000;
+	this.flags = 0x0000;
 	this.hw = new Buffer(pkt.chaddr.split(':').map(function(part) {
         return parseInt(part, 16);
     }));
 
-	this.ciaddr = this.yiaddr = this.siaddr = this.giaddr = [0, 0, 0, 0];
+	this.ciaddr = this.yiaddr = this.siaddr = this.giaddr = '0.0.0.0';
 }
 DHCPAMessage.decode = decodeMessage;
 
