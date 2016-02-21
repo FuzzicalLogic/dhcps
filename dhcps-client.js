@@ -22,6 +22,7 @@ var hex = require('hex');
 
 function DHCPSClient(options) {
 	options = options || { };
+	options.hostname = options.hostname || 'client.ntmobiledev.local';
 	options.address = options.address || '127.0.0.1';
 	options.port = options.port || 68;
 
@@ -141,7 +142,9 @@ DHCPSClient.prototype.createPacket = function(pkt) {
     return p.slice(0, i);
 }
 
-DHCPSClient.prototype.createDiscoverPacket = function(user) {
+DHCPSClient.prototype.discover = function(xid) {
+	var msg = new Message(xid, +MSGTYPES.DHCP_DISCOVER);
+
     var pkt = {
         op:     0x01,
         htype:  0x01,
@@ -162,22 +165,20 @@ DHCPSClient.prototype.createDiscoverPacket = function(user) {
 	return this.createPacket(pkt);
 }
 
-DHCPSClient.prototype.createRequestPacket = function(msg) {
-	msg.options.dhcpMessageType = __NAMESPACE__.Message.TYPES.DHCP_REQUEST.value;
+DHCPSClient.prototype.request = function(msg) {
+	var msg = new Message();
+
+	msg.addOption('dhcpMessageType', MSGTYPES.DHCP_REQUEST.value);
+	this.send()
     return this.createPacket(msg);
 }
 
-DHCPSClient.prototype.createDeclinePacket = function(msg) {
-	msg.options.dhcpMessageType = __NAMESPACE__.Message.TYPES.DHCP_DECLINE.value;
+DHCPSClient.prototype.decline = function(msg) {
+	msg.options.dhcpMessageType = MSGTYPES.DHCP_DECLINE.value;
     return this.createPacket(msg);
 }
 
-DHCPSClient.prototype.createReleasePacket = function(msg) {
-	msg.options.dhcpMessageType = __NAMESPACE__.Message.TYPES.DHCP_RELEASE.value;
+DHCPSClient.prototype.release = function(msg) {
+	msg.options.dhcpMessageType = MSGTYPES.DHCP_RELEASE.value;
     return this.createPacket(msg);
 }
-
-/*DHCPSClient.prototype.send = function(pkt, port, ParentClass, cb) {
-	console.log('Sending Packet to:' + ParentClass + ':' + port);
-	this.client.send(pkt, 0, pkt.length, port, ParentClass, cb);
-}*/
