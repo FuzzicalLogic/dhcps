@@ -36,24 +36,27 @@ function DHCPAMessage(xid, msgtype) {
     }));
 
 	this.ciaddr = this.yiaddr = this.siaddr = this.giaddr = '0.0.0.0';
+	this.options = {
+
+	};
 }
 DHCPAMessage.decode = decodeMessage;
 
 DHCPAMessage.prototype = Object.create(null);
 DHCPAMessage.prototype.encode = encodeMessage;
 
-function encodeMessage() {
+function encodeMessage(packet) {
 
-    var ci = new Buffer(('ciaddr' in pkt) ?
+    var ci = new Buffer(('ciaddr' in this) ?
         new V4Address(this.ciaddr).toArray() : [0, 0, 0, 0]);
-    var yi = new Buffer(('yiaddr' in pkt) ?
+    var yi = new Buffer(('yiaddr' in this) ?
         new V4Address(this.yiaddr).toArray() : [0, 0, 0, 0]);
-    var si = new Buffer(('siaddr' in pkt) ?
+    var si = new Buffer(('siaddr' in this) ?
         new V4Address(this.siaddr).toArray() : [0, 0, 0, 0]);
-    var gi = new Buffer(('giaddr' in pkt) ?
+    var gi = new Buffer(('giaddr' in this) ?
         new V4Address(this.giaddr).toArray() : [0, 0, 0, 0]);
 
-    if (!('chaddr' in pkt))
+    if (!('chaddr' in this))
         throw new Error('pkt.chaddr required');
     var hw = new Buffer(this.chaddr.split(':').map(function(part) {
         return parseInt(part, 16);
@@ -61,81 +64,80 @@ function encodeMessage() {
     if (hw.length !== 6)
         throw new Error('pkt.chaddr malformed, only ' + hw.length + ' bytes');
 
-    var p = new Buffer(1500);
     var i = 0;
 
-    p.writeUInt8(this.op,    i++);
-    p.writeUInt8(this.htype, i++);
-    p.writeUInt8(this.hlen,  i++);
-    p.writeUInt8(this.hops,  i++);
-    p.writeUInt32BE(this.xid,   i); i += 4;
-    p.writeUInt16BE(this.secs,  i); i += 2;
-    p.writeUInt16BE(this.flags, i); i += 2;
-    ci.copy(p, i); i += ci.length;
-    yi.copy(p, i); i += yi.length;
-    si.copy(p, i); i += si.length;
-    gi.copy(p, i); i += gi.length;
-    hw.copy(p, i); i += hw.length;
+    packet.writeUInt8(this.op,    i++);
+    packet.writeUInt8(this.htype, i++);
+    packet.writeUInt8(this.hlen,  i++);
+    packet.writeUInt8(this.hops,  i++);
+    packet.writeUInt32BE(this.xid,   i); i += 4;
+    packet.writeUInt16BE(this.secs,  i); i += 2;
+    packet.writeUInt16BE(this.flags, i); i += 2;
+    ci.copy(packet, i); i += ci.length;
+    yi.copy(packet, i); i += yi.length;
+    si.copy(packet, i); i += si.length;
+    gi.copy(packet, i); i += gi.length;
+    hw.copy(packet, i); i += hw.length;
 
-    p.fill(0, i, i + 10); i += 10; // hw address padding
-    p.fill(0, i, i + 192); i += 192;
-    p.writeUInt32BE(0x63825363, i); i += 4;
+    packet.fill(0, i, i + 10); i += 10; // hw address padding
+    packet.fill(0, i, i + 192); i += 192;
+    packet.writeUInt32BE(0x63825363, i); i += 4;
 
-    if (this.options && 'requestedIpAddress' in this.options) {
-        p.writeUInt8(50, i++); // option 50
+    if ('requestedIpAddress' in this.options) {
+        packet.writeUInt8(50, i++); // option 50
         var requestedIpAddress = new Buffer(
             new v4.Address(this.options.requestedIpAddress).toArray());
-        p.writeUInt8(requestedIpAddress.length, i++);
-        requestedIpAddress.copy(p, i); i += requestedIpAddress.length;
+        packet.writeUInt8(requestedIpAddress.length, i++);
+        requestedIpAddress.copy(packet, i); i += requestedIpAddress.length;
     }
-    if (this.options && 'dhcpMessageType' in this.options) {
-        p.writeUInt8(53, i++); // option 53
-        p.writeUInt8(1, i++);  // length
-        p.writeUInt8(this.options.dhcpMessageType, i++);
+    if ('dhcpMessageType' in this.options) {
+        packet.writeUInt8(53, i++); // option 53
+        packet.writeUInt8(1, i++);  // length
+        packet.writeUInt8(this.options.dhcpMessageType, i++);
     }
-    if (this.options && 'serverIdentifier' in this.options) {
-        p.writeUInt8(54, i++); // option 54
+    if ('serverIdentifier' in this.options) {
+        packet.writeUInt8(54, i++); // option 54
         var serverIdentifier = new Buffer(
             new v4.Address(this.options.serverIdentifier).toArray());
-        p.writeUInt8(serverIdentifier.length, i++);
-        serverIdentifier.copy(p, i); i += serverIdentifier.length;
+        packet.writeUInt8(serverIdentifier.length, i++);
+        serverIdentifier.copy(packet, i); i += serverIdentifier.length;
     }
-    if (this.options && 'parameterRequestList' in this.options) {
-        p.writeUInt8(55, i++); // option 55
+    if ('parameterRequestList' in this.options) {
+        packet.writeUInt8(55, i++); // option 55
         var parameterRequestList = new Buffer(this.options.parameterRequestList);
         if (parameterRequestList.length > 16)
             throw new Error('pkt.options.parameterRequestList malformed');
-        p.writeUInt8(parameterRequestList.length, i++);
-        parameterRequestList.copy(p, i); i += parameterRequestList.length;
+        packet.writeUInt8(parameterRequestList.length, i++);
+        parameterRequestList.copy(packet, i); i += parameterRequestList.length;
     }
-    if (this.options && 'clientIdentifier' in this.options) {
+    if ('clientIdentifier' in this.options) {
         var clientIdentifier = new Buffer(this.options.clientIdentifier);
         var optionLength = 1 + clientIdentifier.length;
         if (optionLength > 0xff)
             throw new Error('pkt.options.clientIdentifier malformed');
-        p.writeUInt8(61, i++);           // option 61
-        p.writeUInt8(optionLength, i++); // length
-        p.writeUInt8(0, i++);            // hardware type 0
-        clientIdentifier.copy(p, i); i += clientIdentifier.length;
+        packet.writeUInt8(61, i++);           // option 61
+        packet.writeUInt8(optionLength, i++); // length
+        packet.writeUInt8(0, i++);            // hardware type 0
+        clientIdentifier.copy(packet, i); i += clientIdentifier.length;
     }
 
     // option 255 - end
-    p.writeUInt8(0xff, i++);
+    packet.writeUInt8(0xff, i++);
 
     // padding
     if ((i % 2) > 0) {
-        p.writeUInt8(0, i++);
+        packet.writeUInt8(0, i++);
     } else {
-        p.writeUInt16BE(0, i++);
+        packet.writeUInt16BE(0, i++);
     }
 
     var remaining = 300 - i;
     if (remaining) {
-        p.fill(0, i, i + remaining); i+= remaining;
+        packet.fill(0, i, i + remaining); i+= remaining;
     }
 
     //console.log('createPacket:', i, 'bytes');
-    return p.slice(0, i);
+    return packet.slice(0, i);
 }
 
 function decodeMessage(msg, rinfo) {

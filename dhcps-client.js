@@ -65,28 +65,32 @@ DHCPSClient.prototype.discover = function(xid) {
     if ('chaddr' in user) pkt.chaddr = user.chaddr;
     if ('options' in user) pkt.options = user.options;
 
-	var pkt = msg.encode();
+	var pkt = new Buffer(1500);
+	msg.encode(pkt);
 
 	return this.send(pkt);
 }
 
 DHCPSClient.prototype.request = function(offer) {
 	var msg = new Message(offer.xid, +MSGTYPES.DHCP_REQUEST),
-		pkt = msg.encode();
+		pkt = new Buffer(1500);
+	msg.encode(pkt);
 
 	return this.send(pkt);
 }
 
 DHCPSClient.prototype.decline = function(offer) {
 	var msg = new Message(offer.xid, +MSGTYPES.DHCP_DECLINE),
-		pkt = msg.encode();
+		pkt = new Buffer(1500);
+	msg.encode(pkt);
 
 	return this.send(pkt);
 }
 
 DHCPSClient.prototype.release = function(xid) {
 	var msg = new Message(offer.xid, +MSGTYPES.DHCP_RELEASE),
-		pkt = msg.encode();
+		pkt = new Buffer(1500);
+	msg.encode(pkt);
 
 	return this.send(pkt);
 }

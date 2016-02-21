@@ -29,21 +29,24 @@ function DHCPSServer(options) {
 
 DHCPSServer.prototype.offer = function(discovery) {
 	var msg = new Message(offer.xid, +MSGTYPES.DHCP_OFFER),
-		pkt = msg.encode();
+		pkt = new Buffer(1500);
+	msg.encode(pkt);
 
 	return this.send(pkt);
 }
 
 DHCPSServer.prototype.ack = function(request) {
 	var msg = new Message(offer.xid, +MSGTYPES.DHCP_ACK),
-		pkt = msg.encode();
+		pkt = new Buffer(1500);
+	msg.encode(pkt);
 
 	return this.send(pkt);
 }
 
 DHCPSServer.prototype.nak = function(request) {
 	var msg = new Message(offer.xid, +MSGTYPES.DHCP_NAK),
-		pkt = msg.encode();
+		pkt = new Buffer(1500);
+	msg.encode(pkt);
 
 	return this.send(pkt);
 }
