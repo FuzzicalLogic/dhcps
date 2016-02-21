@@ -22,7 +22,7 @@ module.exports = (namespace, EnumClass) => {
 }
 var assert = require('assert');
 
-function DHCPAMessage() {
+function DHCPAMessage(xid, msgtype) {
 	this.xid = xid || 0x00000001;
 
 	this.op = 0x01;
