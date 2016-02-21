@@ -112,9 +112,11 @@ function broadcastMessage(msg, callback) {
 	);
 }
 
-function sendMessage(pkt, port, host, cb) {
-	console.log('Sending Packet to:' + host + ':' + port);
-	this.socket.send(pkt, 0, pkt.length, port, host, cb);
+function sendMessage(msg, host, port, cb) {
+	console.log('Sending Message to: ' + host + ':' + port);
+
+	var packet = msg.encode();
+	this.socket.send(packet, 0, packet.length, port, host, cb);
 }
 
 
