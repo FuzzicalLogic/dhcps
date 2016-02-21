@@ -48,7 +48,7 @@ DHCPSClient.prototype.broadcast = function(pkt, cb) {
 DHCPSClient.prototype.discover = function(xid) {
 	var msg = new Message(xid, +MSGTYPES.DHCP_DISCOVER);
 
-    var pkt = {
+    var opts = {
         op:     0x01,
         htype:  0x01,
         hlen:   0x06,
@@ -65,23 +65,28 @@ DHCPSClient.prototype.discover = function(xid) {
     if ('chaddr' in user) pkt.chaddr = user.chaddr;
     if ('options' in user) pkt.options = user.options;
 
-	return this.createPacket(pkt);
+	var pkt = msg.encode();
+
+	return this.send(pkt);
 }
 
-DHCPSClient.prototype.request = function(msg) {
-	var msg = new Message();
+DHCPSClient.prototype.request = function(offer) {
+	var msg = new Message(offer.xid, +MSGTYPES.DHCP_REQUEST),
+		pkt = msg.encode();
 
-	msg.addOption('dhcpMessageType', MSGTYPES.DHCP_REQUEST.value);
-	this.send()
-    return this.createPacket(msg);
+	return this.send(pkt);
 }
 
-DHCPSClient.prototype.decline = function(msg) {
-	msg.options.dhcpMessageType = MSGTYPES.DHCP_DECLINE.value;
-    return this.createPacket(msg);
+DHCPSClient.prototype.decline = function(offer) {
+	var msg = new Message(offer.xid, +MSGTYPES.DHCP_DECLINE),
+		pkt = msg.encode();
+
+	return this.send(pkt);
 }
 
-DHCPSClient.prototype.release = function(msg) {
-	msg.options.dhcpMessageType = MSGTYPES.DHCP_RELEASE.value;
-    return this.createPacket(msg);
+DHCPSClient.prototype.release = function(xid) {
+	var msg = new Message(offer.xid, +MSGTYPES.DHCP_RELEASE),
+		pkt = msg.encode();
+
+	return this.send(pkt);
 }

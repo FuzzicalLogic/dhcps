@@ -27,17 +27,23 @@ function DHCPSServer(options) {
 	__SUPER__.call(this, options);
 }
 
-DHCPSServer.prototype.offer = function(msg) {
-	msg.options.dhcpMessageType = MSGTYPES.DHCP_OFFER.value;
-    return this.createPacket(msg);
+DHCPSServer.prototype.offer = function(discovery) {
+	var msg = new Message(offer.xid, +MSGTYPES.DHCP_OFFER),
+		pkt = msg.encode();
+
+	return this.send(pkt);
 }
 
-DHCPSServer.prototype.ack = function(msg) {
-	msg.options.dhcpMessageType = MSGTYPES.DHCP_ACK.value;
-    return this.createPacket(msg);
+DHCPSServer.prototype.ack = function(request) {
+	var msg = new Message(offer.xid, +MSGTYPES.DHCP_ACK),
+		pkt = msg.encode();
+
+	return this.send(pkt);
 }
 
-DHCPSServer.prototype.nak = function(msg) {
-	msg.options.dhcpMessageType = MSGTYPES.DHCP_NAK.value;
-    return this.createPacket(msg);
+DHCPSServer.prototype.nak = function(request) {
+	var msg = new Message(offer.xid, +MSGTYPES.DHCP_NAK),
+		pkt = msg.encode();
+
+	return this.send(pkt);
 }
