@@ -28,7 +28,7 @@ function DHCPSServer(options) {
 }
 
 DHCPSServer.prototype.offer = function(discovery) {
-	var msg = new Message(offer.xid, +MSGTYPES.DHCP_OFFER),
+	var msg = new Message(discovery.xid, +MSGTYPES.DHCP_OFFER),
 		pkt = new Buffer(1500);
 	msg.encode(pkt);
 
@@ -36,7 +36,7 @@ DHCPSServer.prototype.offer = function(discovery) {
 }
 
 DHCPSServer.prototype.ack = function(request) {
-	var msg = new Message(offer.xid, +MSGTYPES.DHCP_ACK),
+	var msg = new Message(request.xid, +MSGTYPES.DHCP_ACK),
 		pkt = new Buffer(1500);
 	msg.encode(pkt);
 
@@ -44,7 +44,7 @@ DHCPSServer.prototype.ack = function(request) {
 }
 
 DHCPSServer.prototype.nak = function(request) {
-	var msg = new Message(offer.xid, +MSGTYPES.DHCP_NAK),
+	var msg = new Message(request.xid, +MSGTYPES.DHCP_NAK),
 		pkt = new Buffer(1500);
 	msg.encode(pkt);
 

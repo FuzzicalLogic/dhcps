@@ -31,10 +31,7 @@ function DHCPSClient(options) {
 
 DHCPSClient.prototype.start = function(callback) {
 	__SUPER__.prototype.start.call(() => {
-		this.broadcast(
-			this.createDiscoverPacket(),
-			__SUPER__.SYSTEM_BROADCAST_ADDRESS
-		);
+		this.broadcast(this.discover());
 
 		if (typeof callback === 'function')
 			callback();
