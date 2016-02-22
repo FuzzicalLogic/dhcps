@@ -32,9 +32,22 @@ function DHCPAMessage(xid, msgtype) {
 	this.hops = 0x00;
 	this.secs = 0x0000;
 	this.flags = 0x0000;
-	this.hw = new Buffer(pkt.chaddr.split(':').map(function(part) {
+	attribute(this, 'chaddr', {
+		initial: '01:02:03:04:05:06',
+		onChange: 'chaddrChanged',
+		validator: (v) => {
+			return v === ''+v;
+		}
+	});
+	this.on('chaddrChanged', (newValue, oldValue) => {
+		console.log('ChAddr has Changed');
+		/*this.hw(new Buffer(newValue.split(':').map((part) => {
+	        return parseInt(part, 16);
+	    })));*/
+	})
+	/*this.hw = new Buffer(pkt.chaddr.split(':').map(function(part) {
         return parseInt(part, 16);
-    }));
+    }));*/
 
 	this.ciaddr = this.yiaddr = this.siaddr = this.giaddr = '0.0.0.0';
 	this.options = {
