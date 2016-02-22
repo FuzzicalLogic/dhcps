@@ -20,7 +20,8 @@ module.exports = (namespace, EnumClass) => {
 
 	return DHCPAMessage;
 }
-var assert = require('assert');
+var assert = require('assert'),
+	attribute = require('attribute');
 
 function DHCPAMessage(xid, msgtype) {
 	this.xid = xid || 0x00000001;
