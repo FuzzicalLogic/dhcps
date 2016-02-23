@@ -81,7 +81,7 @@ Object.defineProperties(DHCPHost, {
 Object.defineProperties(DHCPHost.prototype, {
 	start: { value: startServer },
 	send: { value: sendMessage },
-	broadcast: { value: broadcastMessage },
+	broadcast: { value: broadcastPacket },
 	close: { value: closeServer }
 });
 
@@ -97,12 +97,12 @@ function startServer(callback) {
 	this.bind(callback);
 }
 
-function broadcastMessage(msg, callback) {
-	var pack = this.createPacket(msg);
+function broadcastPacket(packet, callback) {
+	//var pack = this.createPacket(msg);
 	this.socket.setBroadcast(true);
 	this.socket.send(
-		pack,
-		0, pack.length,
+		packet,
+		0, packet.length,
 		67, DHCPHost.SYSTEM_BROADCAST_ADDRESS,
 		(error) => {
 			this.socket.setBroadcast(false);
