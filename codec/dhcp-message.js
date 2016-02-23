@@ -76,14 +76,10 @@ DHCPAMessage.prototype.encode = encodeMessage;
 
 function encodeMessage(packet) {
 
-    var ci = new Buffer(('ciaddr' in this) ?
-        new V4Address(this.ciaddr).toArray() : [0, 0, 0, 0]);
-    var yi = new Buffer(('yiaddr' in this) ?
-        new V4Address(this.yiaddr).toArray() : [0, 0, 0, 0]);
-    var si = new Buffer(('siaddr' in this) ?
-        new V4Address(this.siaddr).toArray() : [0, 0, 0, 0]);
-    var gi = new Buffer(('giaddr' in this) ?
-        new V4Address(this.giaddr).toArray() : [0, 0, 0, 0]);
+    var ci = new Buffer(new V4Address(this.ciaddr()).toArray());
+    var yi = new Buffer(new V4Address(this.yiaddr()).toArray());
+    var si = new Buffer(new V4Address(this.siaddr()).toArray());
+    var gi = new Buffer(new V4Address(this.giaddr()).toArray());
 
     if (!('chaddr' in this))
         throw new Error('pkt.chaddr required');
