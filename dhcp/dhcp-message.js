@@ -6,8 +6,8 @@ module.exports = (namespace, EnumClass, protocol) => {
 		? namespace
 		: Object.create(null);
 	Enum = EnumClass;
-	_protocol_ = protocol
-
+	_protocol_ = protocol;
+	addTypes();
 
 	DHCPSMessage.TYPES = Object.freeze(new Enum()
 		.add('DHCP_DISCOVER', 1)
@@ -404,19 +404,20 @@ function readAddressRaw(buffer, offset, len) {
 	return addr;
 }
 
-
-Object.defineProperty(DHCPSMessage, 'OPTIONS', {
-	value: Object.create(null)
-});
-	Object.defineProperty(DHCPSMessage.OPTIONS, 2, {
-		value: new __namespace__.MessageOption(
-			'timeOffset',
-			2,
-			4,
-			function(buffer, offset) {
-				assert(strictEqual(buffer.readUInt8(offset++)));
-				return buffer.readUInt32BE(offset);
-			},
-			function() {}
-		)
+function addTypes() {
+	Object.defineProperty(DHCPSMessage, 'OPTIONS', {
+		value: Object.create(null)
 	});
+		Object.defineProperty(DHCPSMessage.OPTIONS, 2, {
+			value: new __namespace__.MessageOption(
+				'timeOffset',
+				2,
+				4,
+				function(buffer, offset) {
+					assert(strictEqual(buffer.readUInt8(offset++)));
+					return buffer.readUInt32BE(offset);
+				},
+				function() {}
+			)
+		});
+}
