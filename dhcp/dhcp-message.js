@@ -120,6 +120,11 @@ function encodeMessage(packet) {
         packet.writeUInt8(requestedIpAddress.length, i++);
         requestedIpAddress.copy(packet, i); i += requestedIpAddress.length;
     }
+	if ('timeOffset' in this.options) {
+        packet.writeUInt8(4, i++); // option 50
+        packet.writeUInt32(this.options.timeOffset, i);
+		i += 4;
+    }
     if ('dhcpMessageType' in this.options) {
         packet.writeUInt8(53, i++); // option 53
         packet.writeUInt8(1, i++);  // length
