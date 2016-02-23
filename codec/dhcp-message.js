@@ -27,7 +27,7 @@ var util = require('util'),
 
 util.inherits(DHCPAMessage, EventEmitter);
 function DHCPAMessage(xid, msgtype) {
-	EventEmitter(this);
+	EventEmitter.call(this);
 
 	this.xid = xid || 0x00000001;
 
