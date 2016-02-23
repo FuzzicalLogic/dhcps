@@ -122,7 +122,7 @@ function encodeMessage(packet) {
     }
 	if ('timeOffset' in this.options) {
         packet.writeUInt8(4, i++); // option 50
-        packet.writeUInt32(this.options.timeOffset, i);
+        packet.writeUInt32BE(this.options.timeOffset, i);
 		i += 4;
     }
     if ('dhcpMessageType' in this.options) {
