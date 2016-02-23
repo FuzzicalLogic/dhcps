@@ -181,19 +181,19 @@ function decodePacket(packet, rinfo) {
 		  .yiaddr(readIpRaw(packet, 16))
 		  .siaddr(readIpRaw(packet, 20))
 		  .giaddr(readIpRaw(packet, 24))
-		  .chaddr()
+		  .chaddr('01:02:03:04:05:06')
 		  .sname(trimNulls(packet.toString('ascii', 44, 108)))
 		  .file(trimNulls(packet.toString('ascii', 108, 236)))
 		  .magic(packet.readUInt32BE(236));
 
-	msg.options;
-	//console.log(rinfo.address + ':' + rinfo.port + '/' + msg.length + 'b');
+	msg.options = {};
 
-    var p = {
+    /*var p = {
         chaddr: __NAMESPACE__.protocol.createHardwareAddress(
                     __NAMESPACE__.protocol.ARPHardwareType.get(packet.readUInt8(1)),
                     readAddressRaw(packet, 28, packet.readUInt8(2))),
     };
+	*/
 
     var offset = 240;
     var code = 0;
@@ -370,31 +370,31 @@ function trimNulls(str) {
 	var idx = str.indexOf('\u0000');
 	return (-1 === idx) ? str : str.substr(0, idx);
 }
-function readIpRaw(msg, offset) {
+function readIpRaw(buffer, offset) {
 	//if (0 === msg.readUInt8(offset))
 		//return undefined;
 	return '' +
-		msg.readUInt8(offset++) + '.' +
-		msg.readUInt8(offset++) + '.' +
-		msg.readUInt8(offset++) + '.' +
-		msg.readUInt8(offset++);
+		buffer.readUInt8(offset++) + '.' +
+		buffer.readUInt8(offset++) + '.' +
+		buffer.readUInt8(offset++) + '.' +
+		buffer.readUInt8(offset++);
 }
-function readIp(msg, offset, obj, name) {
-	var len = msg.readUInt8(offset++);
+function readIp(buffer, offset, msg, name) {
+	var len = buffer.readUInt8(offset++);
 	assert.strictEqual(len, 4);
 	msg.options[name] = readIpRaw(msg, offset);
 	return offset + len;
 }
-function readString(msg, offset, obj, name) {
-	var len = msg.readUInt8(offset++);
-	msg.options[name] = msg.toString('ascii', offset, offset + len);
+function readString(buffer, offset, msg, name) {
+	var len = buffer.readUInt8(offset++);
+	msg.options[name] = buffer.toString('ascii', offset, offset + len);
 	offset += len;
 	return offset;
 }
-function readAddressRaw(msg, offset, len) {
+function readAddressRaw(buffer, offset, len) {
 	var addr = '';
 	while (len-- > 0) {
-		var b = msg.readUInt8(offset++);
+		var b = buffer.readUInt8(offset++);
 		addr += (b + 0x100).toString(16).substr(-2);
 		if (len > 0) {
 			addr += ':';
