@@ -9,7 +9,7 @@ module.exports = (namespace, EnumClass, protocol) => {
 	_protocol_ = protocol
 
 
-	DHCPAMessage.TYPES = Object.freeze(new Enum()
+	DHCPSMessage.TYPES = Object.freeze(new Enum()
 		.add('DHCP_DISCOVER', 1)
 		.add('DHCP_OFFER', 2)
 		.add('DHCP_REQUEST', 3)
@@ -19,7 +19,7 @@ module.exports = (namespace, EnumClass, protocol) => {
 		.add('DHCP_RELEASE', 7)
 	);
 
-	return DHCPAMessage;
+	return DHCPSMessage;
 }
 var util = require('util'),
 	assert = require('assert'),
@@ -27,8 +27,8 @@ var util = require('util'),
 	V4Address = require('ip-address').Address4,
 	EventEmitter = require('events').EventEmitter;
 
-util.inherits(DHCPAMessage, EventEmitter);
-function DHCPAMessage(xid, msgtype) {
+util.inherits(DHCPSMessage, EventEmitter);
+function DHCPSMessage(xid, msgtype) {
 	EventEmitter.call(this);
 
 	this.xid = xid || 0x00000001;
@@ -74,10 +74,10 @@ function DHCPAMessage(xid, msgtype) {
 
 	};
 }
-DHCPAMessage.decode = decodePacket;
+DHCPSMessage.decode = decodePacket;
 
-//DHCPAMessage.prototype = Object.create(null);
-DHCPAMessage.prototype.encode = encodeMessage;
+//DHCPSMessage.prototype = Object.create(null);
+DHCPSMessage.prototype.encode = encodeMessage;
 
 function encodeMessage(packet) {
 
@@ -174,7 +174,7 @@ function decodePacket(packet, rinfo) {
 	var op = _protocol_.BOOTPMessageType.get(packet.readUInt8(0)),
 	    hlen = packet.readUInt8(2),
 		hops = packet.readUInt8(3),
-		msg = new DHCPAMessage(packet.readUInt32BE(4), DHCPAMessage.TYPES.DHCP_RELEASE);
+		msg = new DHCPSMessage(packet.readUInt32BE(4), DHCPSMessage.TYPES.DHCP_RELEASE);
 
 	msg.secs(packet.readUInt16BE(8))
 		  .flags(packet.readUInt16BE(10))
@@ -293,7 +293,7 @@ function decodePacket(packet, rinfo) {
                 var mtype = packet.readUInt8(offset++);
                 assert.ok(1 <= mtype);
                 assert.ok(8 >= mtype);
-                msg.options.dhcpMessageType = DHCPAMessage.TYPES.get(mtype);
+                msg.options.dhcpMessageType = DHCPSMessage.TYPES.get(mtype);
                 break;
             }
             case 54: {          // serverIdentifier
@@ -405,28 +405,18 @@ function readAddressRaw(buffer, offset, len) {
 }
 
 
-/*
-function readIP(msg, offset, obj, name) {
-
-}
-
-function readRawIP(msg, offset) {
-	return [0,0,0,0]
-		.map(() => { return msg.readUInt8(offset++) })
-		.join('.');
-}
-
-function readAddressRaw(msg, offset, len) {
-	var addr = [];
-	while (len-- > 0) {
-		addr.push(msg.readUInt8(offset++));
-	}
-	return addr.map((v) => {
-		return (v + 0x100).toString(16).substr(-2);
-	}).join(':')
-}
-
-function trimNulls(str) {
-	return str.replace(/\u0000+/, '');
-}
-*/
+Object.defineProperty(DHCPSMessage, 'OPTIONS', {
+	value: Object.create(null);
+});
+	Object.defineProperty(DHCPSMessage.OPTIONS, 2, {
+		value: new __namespace__.MessageOption(
+			'timeOffset',
+			2,
+			4,
+			function(buffer, offset) {
+				assert(strictEqual(buffer.readUInt8(offset++)));
+				return buffer.readUInt32BE(offset);
+			},
+			function() {}
+		)
+	});
