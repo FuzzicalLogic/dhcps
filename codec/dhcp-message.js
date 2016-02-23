@@ -41,16 +41,16 @@ function DHCPAMessage(xid, msgtype) {
 				return v === ''+v;
 			}
 		},
-		htype: { initial: 0x01, validator: () => { return true;} },
-		hlen: { initial: 0x06, validator: () => { return true;} },
-		hops: { initial: 0x00, validator: () => { return true;} },
-		secs: { initial: 0x0000, validator: () => { return true;} },
-		flags: { initial: 0x0000, validator: () => { return true;} },
-		ciaddr: { initial: '0.0.0.0', validator: () => { return true;} },
-		yiaddr: { initial: '0.0.0.0', validator: () => { return true;} },
-		siaddr: { initial: '0.0.0.0', validator: () => { return true;} },
-		giaddr: { initial: '0.0.0.0', validator: () => { return true;} },
-	}
+		htype: { initial: 0x01, validator: (v) => { return 'number' === typeof v;} },
+		hlen: { initial: 0x06, validator: (v) => { return 'number' === typeof v;} },
+		hops: { initial: 0x00, validator: (v) => { return 'number' === typeof v;} },
+		secs: { initial: 0x0000, validator: (v) => { return 'number' === typeof v;} },
+		flags: { initial: 0x0000, validator: (v) => { return 'number' === typeof v;} },
+		ciaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
+		yiaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
+		siaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
+		giaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
+	};
 	Object.keys(config).forEach((key) => {
 		attribute(this, key, config[key]);
 	});
