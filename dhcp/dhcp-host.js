@@ -1,7 +1,7 @@
 "use strict";
-var __NAMESPACE__;
+var __namespace__;
 module.exports = (namespace) => {
-	__NAMESPACE__ = 'object' === typeof namespace
+	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
 
@@ -56,11 +56,11 @@ function DHCPHost(opts) {
 
     this.socket = dgram.createSocket('udp4');
     this.socket.on('message', (pkt, rinfo) => {
-		var msg = __NAMESPACE__.Message.decode(pkt, rinfo);
+		var msg = __namespace__.Message.decode(pkt, rinfo);
     	this.emit('message', rinfo, msg);
 
 		console.log('DHCP/A Message received from: ' + rinfo.address + ':' + rinfo.port );
-		var type = __NAMESPACE__.Message.TYPES.get(msg.options.dhcpMessageType);
+		var type = __namespace__.Message.TYPES.get(msg.options.dhcpMessageType);
 		if (!!type) {
 			var event = type.name.toLowerCase().replace('dhcp_', '');
 			this.emit(event, rinfo, msg);

@@ -1,8 +1,8 @@
 "use strict";
-var __NAMESPACE__,
+var __namespace__,
 	Enum;
 module.exports = (namespace, EnumClass) => {
-	__NAMESPACE__ = 'object' === typeof namespace
+	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
 	Enum = EnumClass;
@@ -52,7 +52,8 @@ function DHCPAMessage(xid, msgtype) {
 		giaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
 		sname: { initial: '', validator: (v) => { return 'string' === typeof v;} },
 		file: { initial: '', validator: (v) => { return 'string' === typeof v;} },
-		magic: { initial: '', validator: (v) => { return 'number' === typeof v;} },
+	// RFC2131 - Magic Cookie
+		magic: { initial: '', validator: (v) => { return v === 0x63825363; } },
 	};
 	Object.keys(config).forEach((key) => {
 		attribute(this, key, config[key]);
@@ -64,10 +65,6 @@ function DHCPAMessage(xid, msgtype) {
 	        return parseInt(part, 16);
 	    })));*/
 	});
-	console.log(this.ciaddr())
-	console.log(this.yiaddr())
-	console.log(this.siaddr())
-	console.log(this.giaddr())
 	/*this.hw = new Buffer(pkt.chaddr.split(':').map(function(part) {
         return parseInt(part, 16);
     }));*/
@@ -173,7 +170,7 @@ function encodeMessage(packet) {
 }
 
 function decodePacket(packet, rinfo) {
-	var op = __NAMESPACE__.protocol.BOOTPMessageType.get(packet.readUInt8(0)),
+	var op = __namespace__.protocol.BOOTPMessageType.get(packet.readUInt8(0)),
 	    hlen = packet.readUInt8(2),
 		hops = packet.readUInt8(3),
 		msg = new DHCPAMessage(packet.readUInt32BE(4), DHCPAMessage.TYPES.DHCP_RELEASE);
@@ -192,8 +189,8 @@ function decodePacket(packet, rinfo) {
 	msg.options = {};
 
     /*var p = {
-        chaddr: __NAMESPACE__.protocol.createHardwareAddress(
-                    __NAMESPACE__.protocol.ARPHardwareType.get(packet.readUInt8(1)),
+        chaddr: __namespace__.protocol.createHardwareAddress(
+                    __namespace__.protocol.ARPHardwareType.get(packet.readUInt8(1)),
                     readAddressRaw(packet, 28, packet.readUInt8(2))),
     };
 	*/
@@ -339,8 +336,8 @@ function decodePacket(packet, rinfo) {
             case 61: {          // clientIdentifier
                 var len = packet.readUInt8(offset++);
                 msg.options.clientIdentifier =
-                    __NAMESPACE__.protocol.createHardwareAddress(
-                        __NAMESPACE__.protocol.ARPHardwareType.get(packet.readUInt8(offset)),
+                    __namespace__.protocol.createHardwareAddress(
+                        __namespace__.protocol.ARPHardwareType.get(packet.readUInt8(offset)),
                         readAddressRaw(packet, offset + 1, len - 1));
                 offset += len;
                 break;

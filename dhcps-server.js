@@ -1,17 +1,17 @@
 "use strict";
-var __NAMESPACE__, __SUPER__, Message, MSGTYPES;
+var __namespace__, __super__, Message, MSGTYPES;
 
 module.exports = (namespace, ParentClass) => {
-	__NAMESPACE__ = 'object' === typeof namespace
+	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
-	Message = __NAMESPACE__.Message;
+	Message = __namespace__.Message;
 	MSGTYPES = Message.TYPES;
 
-	__SUPER__ = 'function' === typeof ParentClass
+	__super__ = 'function' === typeof ParentClass
 		? ParentClass
 		: () => {};
-	util.inherits(DHCPSServer, __SUPER__);
+	util.inherits(DHCPSServer, __super__);
 
 	return DHCPSServer;
 }
@@ -24,7 +24,7 @@ function DHCPSServer(options) {
 	options.address = options.address || '127.0.0.1';
 	options.port = options.port || 67;
 
-	__SUPER__.call(this, options);
+	__super__.call(this, options);
 }
 
 DHCPSServer.prototype.offer = function(discovery) {

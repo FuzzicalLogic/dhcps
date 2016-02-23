@@ -1,17 +1,17 @@
 "use strict";
-var __NAMESPACE__, __SUPER__, Message, MSGTYPES;
+var __namespace__, __super__, Message, MSGTYPES;
 
 module.exports = (namespace, ParentClass) => {
-	__NAMESPACE__ = 'object' === typeof namespace
+	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
-	Message = __NAMESPACE__.Message;
+	Message = __namespace__.Message;
 	MSGTYPES = Message.TYPES;
 
-	__SUPER__ = 'function' === typeof ParentClass
+	__super__ = 'function' === typeof ParentClass
 		? ParentClass
 		: () => {};
-	util.inherits(DHCPSClient, __SUPER__);
+	util.inherits(DHCPSClient, __super__);
 
 	return DHCPSClient;
 }
@@ -26,15 +26,14 @@ function DHCPSClient(options) {
 	options.address = options.address || '127.0.0.1';
 	options.port = options.port || 68;
 
-	__SUPER__.call(this, options);
+	__super__.call(this, options);
 }
 
 DHCPSClient.prototype.start = function(callback) {
 	var packet = this.discover(1);
-	__SUPER__.prototype.start.call(this, () => {
+	__super__.prototype.start.call(this, () => {
 		this.broadcast(packet, () => {
 			console.log('DHCPS Client: Broadcast sent');
-			hex(packet);
 		});
 
 		if (typeof callback === 'function')
@@ -43,7 +42,7 @@ DHCPSClient.prototype.start = function(callback) {
 }
 
 DHCPSClient.prototype.broadcast = function(pkt, cb) {
-	return __SUPER__.prototype.broadcast.call(this, pkt, cb);
+	return __super__.prototype.broadcast.call(this, pkt, cb);
 }
 
 DHCPSClient.prototype.discover = function(xid) {
