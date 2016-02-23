@@ -70,9 +70,8 @@ function DHCPSMessage(xid, msgtype) {
         return parseInt(part, 16);
     }));*/
 
-	this.options = {
-
-	};
+	this.options = {};
+	this.options.dhcpMessageType = +msgtype;
 }
 DHCPSMessage.decode = decodePacket;
 DHCPSMessage.OPTIONS = {};
@@ -300,7 +299,7 @@ function decodePacket(packet, rinfo) {
                 msg.options.optionOverload = packet.readUInt8(offset++);
                 break;
             }
-            case 53: {          // dhcpMessageType
+            /*case 53: {          // dhcpMessageType
                 var len = packet.readUInt8(offset++);
                 assert.strictEqual(len, 1);
                 var mtype = packet.readUInt8(offset++);
@@ -308,7 +307,7 @@ function decodePacket(packet, rinfo) {
                 assert.ok(8 >= mtype);
                 msg.options.dhcpMessageType = DHCPSMessage.TYPES.get(mtype);
                 break;
-            }
+            }*/
             case 54: {          // serverIdentifier
                 offset = readIp(packet, offset, msg, 'serverIdentifier');
                 break;
@@ -425,9 +424,25 @@ function addTypes() {
 			4,
 			function(buffer, offset) {
 				assert.strictEqual(buffer.readUInt8(offset++), 4);
-				return buffer.readUInt32BE(offset);
+				return buffer.readUInt32BE(offset) << 0;
 			},
-			function() {}
+			function() {
+				
+			}
+		)
+	});
+	Object.defineProperty(DHCPSMessage.OPTIONS, 53, {
+		value: new __namespace__.MessageOption(
+			'dhcpMessageType',
+			53,
+			2,
+			function(buffer, offset) {
+				assert.strictEqual(buffer.readUInt8(offset++), 1);
+				return DHCPSMessage.TYPES.get(buffer.readUInt8(offset));
+			},
+			function() {
+
+			}
 		)
 	});
 }
