@@ -50,6 +50,8 @@ function DHCPAMessage(xid, msgtype) {
 		yiaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
 		siaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
 		giaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
+		sname: { initial: '', validator: (v) => { return 'string' === typeof v;} },
+		file: { initial: '', validator: (v) => { return 'string' === typeof v;} },
 	};
 	Object.keys(config).forEach((key) => {
 		attribute(this, key, config[key]);
@@ -203,7 +205,7 @@ function decodePacket(packet, rinfo) {
             case 0: continue;   // pad
             case 255: break;    // end
             case 1: {           // subnetMask
-                offset = readIp(packet, offset, p, 'subnetMask');
+                offset = readIp(packet, offset, msg, 'subnetMask');
                 break;
             }
             case 2: {           // timeOffset
@@ -248,11 +250,11 @@ function decodePacket(packet, rinfo) {
                 break;
             }
             case 12: {          // hostName
-                offset = readString(packet, offset, p, 'hostName');
+                offset = readString(packet, offset, msg, 'hostName');
                 break;
             }
             case 15: {          // domainName
-                offset = readString(packet, offset, p, 'domainName');
+                offset = readString(packet, offset, msg, 'domainName');
                 break;
             }
             case 43: {          // vendorOptions
@@ -269,7 +271,7 @@ function decodePacket(packet, rinfo) {
                 break;
             }
             case 50: {          // requestedIpAddress
-                offset = readIp(packet, offset, p, 'requestedIpAddress');
+                offset = readIp(packet, offset, msg, 'requestedIpAddress');
                 break;
             }
             case 51: {          // ipAddressLeaseTime
@@ -296,7 +298,7 @@ function decodePacket(packet, rinfo) {
                 break;
             }
             case 54: {          // serverIdentifier
-                offset = readIp(packet, offset, p, 'serverIdentifier');
+                offset = readIp(packet, offset, msg, 'serverIdentifier');
                 break;
             }
             case 55: {          // parameterRequestList
@@ -330,7 +332,7 @@ function decodePacket(packet, rinfo) {
                 break;
             }
             case 60: {          // vendorClassIdentifier
-                offset = readString(packet, offset, p, 'vendorClassIdentifier');
+                offset = readString(packet, offset, msg, 'vendorClassIdentifier');
                 break;
             }
             case 61: {          // clientIdentifier
@@ -352,7 +354,7 @@ function decodePacket(packet, rinfo) {
                 break;
             }
             case 118: {		    // subnetSelection
-                offset = readIp(packet, offset, p, 'subnetAddress');
+                offset = readIp(packet, offset, msg, 'subnetAddress');
                 break;
             }
             default: {
