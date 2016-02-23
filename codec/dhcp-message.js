@@ -52,6 +52,7 @@ function DHCPAMessage(xid, msgtype) {
 		giaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
 		sname: { initial: '', validator: (v) => { return 'string' === typeof v;} },
 		file: { initial: '', validator: (v) => { return 'string' === typeof v;} },
+		magic: { initial: '', validator: (v) => { return 'number' === typeof v;} },
 	};
 	Object.keys(config).forEach((key) => {
 		attribute(this, key, config[key]);
