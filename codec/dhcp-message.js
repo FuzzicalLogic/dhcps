@@ -23,6 +23,7 @@ module.exports = (namespace, EnumClass) => {
 var util = require('util'),
 	assert = require('assert'),
 	attribute = require('attribute'),
+	V4Address = require('ip-address').Address4,
 	EventEmitter = require('events').EventEmitter;
 
 util.inherits(DHCPAMessage, EventEmitter);
