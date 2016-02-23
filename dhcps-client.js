@@ -5,7 +5,7 @@ module.exports = (namespace, ParentClass) => {
 	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
-	Message = __namespace__.Message;
+	Message = __namespace__.DHCP.Message;
 	MSGTYPES = Message.TYPES;
 
 	__super__ = 'function' === typeof ParentClass
