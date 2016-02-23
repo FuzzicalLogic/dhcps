@@ -1,7 +1,6 @@
 "use strict";
 var __NAMESPACE__,
-	Enum,
-	EventEmitter = require('events');
+	Enum;
 module.exports = (namespace, EnumClass) => {
 	__NAMESPACE__ = 'object' === typeof namespace
 		? namespace
@@ -21,8 +20,10 @@ module.exports = (namespace, EnumClass) => {
 
 	return DHCPAMessage;
 }
-var assert = require('assert'),
-	attribute = require('attribute');
+var util = require('util'),
+	assert = require('assert'),
+	attribute = require('attribute'),
+	EventEmitter = require('events');
 
 util.inherits(DHCPAMessage, EventEmitter);
 function DHCPAMessage(xid, msgtype) {
