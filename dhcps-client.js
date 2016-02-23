@@ -30,24 +30,26 @@ function DHCPSClient(options) {
 }
 
 DHCPSClient.prototype.start = function(callback) {
+	var packet = this.discover(1);
 	__SUPER__.prototype.start.call(() => {
-		this.broadcast(this.discover(1));
+		this.broadcast(packet, () => {
+			console.log('DHCPS Client: Broadcast sent');
+			hex(packet);
+		});
 
 		if (typeof callback === 'function')
-			callback();
+			process.nextTick(callback);
 	});
 }
 
 DHCPSClient.prototype.broadcast = function(pkt, cb) {
-	__SUPER__.prototype.broadcast.call(this, pkt, cb);
+	return __SUPER__.prototype.broadcast.call(this, pkt, cb);
 }
 
 DHCPSClient.prototype.discover = function(xid) {
 	var msg = new Message(xid, +MSGTYPES.DHCP_DISCOVER),
 		pkt = new Buffer(1500);
-	msg.encode(pkt);
-
-	return this.send(pkt);
+	 return msg.encode(pkt);
 }
 
 DHCPSClient.prototype.request = function(offer) {
