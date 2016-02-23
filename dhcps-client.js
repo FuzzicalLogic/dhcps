@@ -49,29 +49,23 @@ DHCPSClient.prototype.discover = function(xid) {
 	var msg = new Message(xid, +MSGTYPES.DHCP_DISCOVER),
 		pkt = new Buffer(1500);
 	msg.options.timeOffset = -3600 >>> 0;
-	 return msg.encode(pkt);
+	return msg.encode(pkt);
 }
 
 DHCPSClient.prototype.request = function(offer) {
 	var msg = new Message(offer.xid, +MSGTYPES.DHCP_REQUEST),
 		pkt = new Buffer(1500);
-	msg.encode(pkt);
-
-	return this.send(pkt);
+	return msg.encode(pkt);
 }
 
 DHCPSClient.prototype.decline = function(offer) {
 	var msg = new Message(offer.xid, +MSGTYPES.DHCP_DECLINE),
 		pkt = new Buffer(1500);
-	msg.encode(pkt);
-
-	return this.send(pkt);
+	return msg.encode(pkt);
 }
 
 DHCPSClient.prototype.release = function(xid) {
 	var msg = new Message(offer.xid, +MSGTYPES.DHCP_RELEASE),
 		pkt = new Buffer(1500);
-	msg.encode(pkt);
-
-	return this.send(pkt);
+	return msg.encode(pkt);
 }
