@@ -61,7 +61,7 @@ function DHCPAMessage(xid, msgtype) {
 }
 DHCPAMessage.decode = decodeMessage;
 
-DHCPAMessage.prototype = Object.create(null);
+//DHCPAMessage.prototype = Object.create(null);
 DHCPAMessage.prototype.encode = encodeMessage;
 
 function encodeMessage(packet) {
