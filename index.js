@@ -25,7 +25,7 @@ Object.defineProperty(__namespace__, 'Server', {
 	value: require('./dhcps-server')(__namespace__, __namespace__.DHCP.Host)
 });
 Object.defineProperty(__namespace__, 'Client', {
-	value: (__namespace__, __namespace__.DHCP.Host)
+	value: require('./dhcps-client')(__namespace__, __namespace__.DHCP.Host)
 });
 Object.defineProperty(__namespace__, 'createServer', {
 	value: (options) => {
