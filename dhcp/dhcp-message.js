@@ -424,7 +424,7 @@ function addTypes() {
 			2,
 			4,
 			function(buffer, offset) {
-				assert(strictEqual(buffer.readUInt8(offset++)));
+				assert.strictEqual(buffer.readUInt8(offset++), 4);
 				return buffer.readUInt32BE(offset);
 			},
 			function() {}
