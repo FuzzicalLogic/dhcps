@@ -1,11 +1,12 @@
 "use strict";
-var __namespace__,
+var __namespace__, _protocol_,
 	Enum;
-module.exports = (namespace, EnumClass) => {
+module.exports = (namespace, EnumClass, protocol) => {
 	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
 	Enum = EnumClass;
+	_protocol_ = protocol
 
 
 	DHCPAMessage.TYPES = Object.freeze(new Enum()
@@ -170,7 +171,7 @@ function encodeMessage(packet) {
 }
 
 function decodePacket(packet, rinfo) {
-	var op = __namespace__.protocol.BOOTPMessageType.get(packet.readUInt8(0)),
+	var op = _protocol_.BOOTPMessageType.get(packet.readUInt8(0)),
 	    hlen = packet.readUInt8(2),
 		hops = packet.readUInt8(3),
 		msg = new DHCPAMessage(packet.readUInt32BE(4), DHCPAMessage.TYPES.DHCP_RELEASE);
@@ -336,8 +337,8 @@ function decodePacket(packet, rinfo) {
             case 61: {          // clientIdentifier
                 var len = packet.readUInt8(offset++);
                 msg.options.clientIdentifier =
-                    __namespace__.protocol.createHardwareAddress(
-                        __namespace__.protocol.ARPHardwareType.get(packet.readUInt8(offset)),
+                    _protocol_.createHardwareAddress(
+                        _protocol_.ARPHardwareType.get(packet.readUInt8(offset)),
                         readAddressRaw(packet, offset + 1, len - 1));
                 offset += len;
                 break;
