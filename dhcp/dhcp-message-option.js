@@ -33,17 +33,19 @@ function DHCPAMessageOption(key, value, size, fnRead, fnWrite) {
 			validator: (v) => {
 				return 'string' === typeof v;
 			}
-		},
-		read: function(buffer, offset) {
-
-		},
-		write: function(buffer, offset) {
-
-		},
+		}
 	};
 	Object.keys(config).forEach((key) => {
 		attribute(this, key, config[key]);
 	});
+
+
+	this.read = fnRead || function(buffer, offset) {
+
+	},
+	this.write = fnWrite || function(buffer, offset) {
+
+	},
 
 }
 DHCPAMessageOption.TYPES = Object.create(null)
