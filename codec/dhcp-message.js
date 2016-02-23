@@ -173,7 +173,7 @@ function decodePacket(packet, rinfo) {
 	var op = __NAMESPACE__.protocol.BOOTPMessageType.get(packet.readUInt8(0)),
 	    hlen = packet.readUInt8(2),
 		hops = packet.readUInt8(3),
-		msg = new Message(packet.readUInt32BE(4), DHCPAMessage.TYPES.DHCP_RELEASE);
+		msg = new DHCPAMessage(packet.readUInt32BE(4), DHCPAMessage.TYPES.DHCP_RELEASE);
 
 	msg.secs(packet.readUInt16BE(8))
 		  .flags(packet.readUInt16BE(10))
