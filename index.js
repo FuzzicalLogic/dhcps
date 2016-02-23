@@ -27,12 +27,12 @@ Object.defineProperty(__namespace__, 'Server', {
 Object.defineProperty(__namespace__, 'Client', {
 	value: (__namespace__, __namespace__.DHCP.Host)
 });
-Object.defineProperty(__namespace__, 'DHCP', {
+Object.defineProperty(__namespace__, 'createServer', {
 	value: (options) => {
 		return new __namespace__.Server(options);
 	}
 });
-Object.defineProperty(__namespace__, 'DHCP', {
+Object.defineProperty(__namespace__, 'createClient', {
 	value: (options) => {
 		return new __namespace__.Client(options);
 	}
