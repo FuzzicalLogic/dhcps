@@ -406,7 +406,7 @@ function readAddressRaw(buffer, offset, len) {
 
 
 Object.defineProperty(DHCPSMessage, 'OPTIONS', {
-	value: Object.create(null);
+	value: Object.create(null)
 });
 	Object.defineProperty(DHCPSMessage.OPTIONS, 2, {
 		value: new __namespace__.MessageOption(
