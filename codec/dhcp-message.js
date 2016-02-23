@@ -78,7 +78,7 @@ function encodeMessage(packet) {
 
     if (!('chaddr' in this))
         throw new Error('pkt.chaddr required');
-    var hw = new Buffer(this.chaddr.split(':').map(function(part) {
+    var hw = new Buffer(this.chaddr().split(':').map(function(part) {
         return parseInt(part, 16);
     }));
     if (hw.length !== 6)
