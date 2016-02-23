@@ -33,7 +33,7 @@ function DHCPAMessage(xid, msgtype) {
 	this.xid = xid || 0x00000001;
 
 	var config = {
-		op : { initial: 0x01 },
+		op : { initial: 0x01, validator: () => { return true;} },
 		chaddr: {
 			initial: '01:02:03:04:05:06',
 			onChange: 'chaddrChanged',
@@ -41,15 +41,15 @@ function DHCPAMessage(xid, msgtype) {
 				return v === ''+v;
 			}
 		},
-		htype: { initial: 0x01 },
-		hlen: { initial: 0x06 },
-		hops: { initial: 0x00 },
-		secs: { initial: 0x0000 },
-		flags: { initial: 0x0000 },
-		ciaddr: { initial: '0.0.0.0' },
-		yiaddr: { initial: '0.0.0.0' },
-		siaddr: { initial: '0.0.0.0' },
-		giaddr: { initial: '0.0.0.0' },
+		htype: { initial: 0x01, validator: () => { return true;} },
+		hlen: { initial: 0x06, validator: () => { return true;} },
+		hops: { initial: 0x00, validator: () => { return true;} },
+		secs: { initial: 0x0000, validator: () => { return true;} },
+		flags: { initial: 0x0000, validator: () => { return true;} },
+		ciaddr: { initial: '0.0.0.0', validator: () => { return true;} },
+		yiaddr: { initial: '0.0.0.0', validator: () => { return true;} },
+		siaddr: { initial: '0.0.0.0', validator: () => { return true;} },
+		giaddr: { initial: '0.0.0.0', validator: () => { return true;} },
 	}
 	Object.keys(config).forEach((key) => {
 		attribute(this, key, config[key]);
