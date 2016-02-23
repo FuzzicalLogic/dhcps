@@ -75,7 +75,7 @@ function DHCPSMessage(xid, msgtype) {
 	};
 }
 DHCPSMessage.decode = decodePacket;
-DHCPS.OPTIONS = {};
+DHCPSMessage.OPTIONS = {};
 
 //DHCPSMessage.prototype = Object.create(null);
 DHCPSMessage.prototype.encode = encodeMessage;
