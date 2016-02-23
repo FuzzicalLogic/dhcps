@@ -29,7 +29,7 @@ function DHCPAMessageOption(key, value, size, fnRead, fnWrite) {
 			}
 		},
 		size: {
-			initial: type,
+			initial: size,
 			validator: (v) => {
 				return 'string' === typeof v;
 			}
