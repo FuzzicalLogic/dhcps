@@ -121,6 +121,7 @@ function encodeMessage(packet) {
         requestedIpAddress.copy(packet, i); i += requestedIpAddress.length;
     }
 	if ('timeOffset' in this.options) {
+		packet.writeUInt8(2, i++);
         packet.writeUInt8(4, i++); // option 50
         packet.writeUInt32BE(this.options.timeOffset, i);
 		i += 4;
