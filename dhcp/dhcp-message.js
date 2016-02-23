@@ -421,13 +421,13 @@ function addTypes() {
 		value: new __namespace__.MessageOption(
 			'timeOffset',
 			2,
-			4,
+			5,
 			function(buffer, offset) {
 				assert.strictEqual(buffer.readUInt8(offset++), 4);
 				return buffer.readUInt32BE(offset) << 0;
 			},
 			function() {
-				
+
 			}
 		)
 	});
