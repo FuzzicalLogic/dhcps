@@ -200,20 +200,26 @@ function decodePacket(packet, rinfo) {
     var code = 0;
     while (code != 255 && offset < packet.length) {
         code = packet.readUInt8(offset++);
-        switch (code) {
+		if (DHCPSMessage.OPTIONS.hasOwnProperty(code)) {
+			var option = DHCPSMessage.OPTIONS[code];
+			msg.options[option.key()] = option.read(packet, offset);
+			offset += option.size();
+			console.log('Option Found: ' + option.key + '(' + msg.options[option.key()]+ ')');
+		}
+		else switch (code) {
             case 0: continue;   // pad
             case 255: break;    // end
             case 1: {           // subnetMask
                 offset = readIp(packet, offset, msg, 'subnetMask');
                 break;
             }
-            case 2: {           // timeOffset
+            /*case 2: {           // timeOffset
                 var len = packet.readUInt8(offset++);
                 assert.strictEqual(len, 4);
                 msg.options.timeOffset = packet.readUInt32BE(offset);
                 offset += len;
                 break;
-            }
+            }*/
             case 3: {           // routerOption
                 var len = packet.readUInt8(offset++);
                 assert.strictEqual(len % 4, 0);
