@@ -60,7 +60,11 @@ function DHCPAMessage(xid, msgtype) {
 		/*this.hw(new Buffer(newValue.split(':').map((part) => {
 	        return parseInt(part, 16);
 	    })));*/
-	})
+	});
+	console.log(this.ciaddr())
+	console.log(this.yiaddr())
+	console.log(this.siaddr())
+	console.log(this.giaddr())
 	/*this.hw = new Buffer(pkt.chaddr.split(':').map(function(part) {
         return parseInt(part, 16);
     }));*/
