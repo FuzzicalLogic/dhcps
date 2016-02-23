@@ -48,7 +48,7 @@ DHCPSClient.prototype.broadcast = function(pkt, cb) {
 DHCPSClient.prototype.discover = function(xid) {
 	var msg = new Message(xid, +MSGTYPES.DHCP_DISCOVER),
 		pkt = new Buffer(1500);
-	msg.options.timeOffset((3600 << 31) >>> 0);
+	msg.options.timeOffset = (3600 << 31) >>> 0;
 	 return msg.encode(pkt);
 }
 
