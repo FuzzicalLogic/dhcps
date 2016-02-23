@@ -31,7 +31,7 @@ function DHCPSClient(options) {
 
 DHCPSClient.prototype.start = function(callback) {
 	__SUPER__.prototype.start.call(() => {
-		this.broadcast(this.discover());
+		this.broadcast(this.discover(1));
 
 		if (typeof callback === 'function')
 			callback();
@@ -43,26 +43,8 @@ DHCPSClient.prototype.broadcast = function(pkt, cb) {
 }
 
 DHCPSClient.prototype.discover = function(xid) {
-	var msg = new Message(xid, +MSGTYPES.DHCP_DISCOVER);
-
-    var opts = {
-        op:     0x01,
-        htype:  0x01,
-        hlen:   0x06,
-        hops:   0x00,
-        xid:    0x00000000,
-        secs:   0x0000,
-        flags:  0x0000,
-        ciaddr: '0.0.0.0',
-        yiaddr: '0.0.0.0',
-        siaddr: '0.0.0.0',
-        giaddr: '0.0.0.0',
-    };
-    if ('xid' in user) pkt.xid = user.xid;
-    if ('chaddr' in user) pkt.chaddr = user.chaddr;
-    if ('options' in user) pkt.options = user.options;
-
-	var pkt = new Buffer(1500);
+	var msg = new Message(xid, +MSGTYPES.DHCP_DISCOVER),
+		pkt = new Buffer(1500);
 	msg.encode(pkt);
 
 	return this.send(pkt);
