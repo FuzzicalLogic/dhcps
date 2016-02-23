@@ -2,21 +2,23 @@
 module.exports = () => {
 	return DHCPS;
 }
-var __NAMESPACE__  = Object.create(null),
-    DHCPS = __NAMESPACE__;
+var __namespace__  = Object.create(null),
+    DHCPS = __namespace__;
 
 var Enum = require('./util/enum');
-__NAMESPACE__.protocol = require('./codec/protocol')(__NAMESPACE__, Enum);
-__NAMESPACE__.MessageOption = require('./codec/dhcp-message-option')(__NAMESPACE__);
-__NAMESPACE__.Message = require('./codec/dhcp-message')(__NAMESPACE__, Enum);
-__NAMESPACE__.DHCP = {};
-__NAMESPACE__.DHCP.Host = require('./dhcp/dhcp-host')(__NAMESPACE__);
-__NAMESPACE__.Server = require('./dhcps-server')(__NAMESPACE__, __NAMESPACE__.DHCP.Host);
-__NAMESPACE__.Client = require('./dhcps-client')(__NAMESPACE__, __NAMESPACE__.DHCP.Host);
-__NAMESPACE__.createServer = (options) => {
-	return new __NAMESPACE__.Server(options);
+Object.defineProperty(__namespace__, 'protocol', {
+	value: require('./codec/protocol')(__namespace__, Enum)
+});
+__namespace__.MessageOption = require('./codec/dhcp-message-option')(__namespace__);
+__namespace__.Message = require('./codec/dhcp-message')(__namespace__, Enum);
+__namespace__.DHCP = {};
+__namespace__.DHCP.Host = require('./dhcp/dhcp-host')(__namespace__);
+__namespace__.Server = require('./dhcps-server')(__namespace__, __namespace__.DHCP.Host);
+__namespace__.Client = require('./dhcps-client')(__namespace__, __namespace__.DHCP.Host);
+__namespace__.createServer = (options) => {
+	return new __namespace__.Server(options);
 };
-__NAMESPACE__.createClient = (options) => {
-	return new __NAMESPACE__.Client(options);
+__namespace__.createClient = (options) => {
+	return new __namespace__.Client(options);
 };
-Object.freeze(__NAMESPACE__);
+Object.freeze(__namespace__);

@@ -1,13 +1,17 @@
 "use strict";
-var __NAMESPACE__, __SUPER__;
+var __namespace__, __super__, Message, MSGTYPES;
+
 module.exports = (namespace, ParentClass) => {
-	__NAMESPACE__ = 'object' === typeof namespace
+	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
-	__SUPER__ = 'function' === typeof ParentClass
+	Message = __namespace__.Message;
+	MSGTYPES = Message.TYPES;
+
+	__super__ = 'function' === typeof ParentClass
 		? ParentClass
 		: () => {};
-	util.inherits(DHCPSServer, __SUPER__);
+	util.inherits(DHCPSServer, __super__);
 
 	return DHCPSServer;
 }
@@ -16,23 +20,33 @@ var util = require('util');
 
 function DHCPSServer(options) {
 	options = options || { };
+	options.hostname = options.hostname || 'dhcps.ntmobiledev.local';
 	options.address = options.address || '127.0.0.1';
 	options.port = options.port || 67;
 
-	__SUPER__.call(this, options);
+	__super__.call(this, options);
 }
 
-DHCPSServer.prototype.createOfferPacket = function(msg) {
-	msg.options.dhcpMessageType = __NAMESPACE__.Message.TYPES.DHCP_OFFER.value;
-    return this.createPacket(msg);
+DHCPSServer.prototype.offer = function(discovery) {
+	var msg = new Message(discovery.xid, +MSGTYPES.DHCP_OFFER),
+		pkt = new Buffer(1500);
+	msg.encode(pkt);
+
+	return this.send(pkt);
 }
 
-DHCPSServer.prototype.createAckPacket = function(msg) {
-	msg.options.dhcpMessageType = __NAMESPACE__.Message.TYPES.DHCP_ACK.value;
-    return this.createPacket(msg);
+DHCPSServer.prototype.ack = function(request) {
+	var msg = new Message(request.xid, +MSGTYPES.DHCP_ACK),
+		pkt = new Buffer(1500);
+	msg.encode(pkt);
+
+	return this.send(pkt);
 }
 
-DHCPSServer.prototype.createNakPacket = function(msg) {
-	msg.options.dhcpMessageType = __NAMESPACE__.Message.TYPES.DHCP_NAK.value;
-    return this.createPacket(msg);
+DHCPSServer.prototype.nak = function(request) {
+	var msg = new Message(request.xid, +MSGTYPES.DHCP_NAK),
+		pkt = new Buffer(1500);
+	msg.encode(pkt);
+
+	return this.send(pkt);
 }

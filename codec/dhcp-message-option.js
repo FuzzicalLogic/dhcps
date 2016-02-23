@@ -1,7 +1,7 @@
 "use strict";
-var __NAMESPACE__;
+var __namespace__;
 module.exports = (namespace) => {
-	__NAMESPACE__ = 'object' === typeof namespace
+	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
 

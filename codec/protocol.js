@@ -1,8 +1,8 @@
 "use strict";
-var __NAMESPACE__,
+var __namespace__,
 	Enum;
 module.exports = (namespace, EnumClass) => {
-	__NAMESPACE__ = 'object' === typeof namespace
+	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
 	Enum = EnumClass;
