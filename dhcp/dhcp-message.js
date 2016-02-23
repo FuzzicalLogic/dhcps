@@ -75,6 +75,7 @@ function DHCPSMessage(xid, msgtype) {
 	};
 }
 DHCPSMessage.decode = decodePacket;
+DHCPS.OPTIONS = {};
 
 //DHCPSMessage.prototype = Object.create(null);
 DHCPSMessage.prototype.encode = encodeMessage;
@@ -417,19 +418,16 @@ function readAddressRaw(buffer, offset, len) {
 }
 
 function addTypes() {
-	Object.defineProperty(DHCPSMessage, 'OPTIONS', {
-		value: Object.create(null)
+	Object.defineProperty(DHCPSMessage.OPTIONS, 2, {
+		value: new __namespace__.MessageOption(
+			'timeOffset',
+			2,
+			4,
+			function(buffer, offset) {
+				assert(strictEqual(buffer.readUInt8(offset++)));
+				return buffer.readUInt32BE(offset);
+			},
+			function() {}
+		)
 	});
-		Object.defineProperty(DHCPSMessage.OPTIONS, 2, {
-			value: new __namespace__.MessageOption(
-				'timeOffset',
-				2,
-				4,
-				function(buffer, offset) {
-					assert(strictEqual(buffer.readUInt8(offset++)));
-					return buffer.readUInt32BE(offset);
-				},
-				function() {}
-			)
-		});
 }
