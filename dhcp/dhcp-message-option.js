@@ -42,10 +42,10 @@ function DHCPAMessageOption(key, value, size, fnRead, fnWrite) {
 
 	this.read = fnRead || function(buffer, offset) {
 
-	},
+	};
 	this.write = fnWrite || function(buffer, offset) {
 
-	},
+	};
 
 }
 DHCPAMessageOption.TYPES = Object.create(null)
