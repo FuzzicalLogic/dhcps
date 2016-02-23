@@ -31,7 +31,7 @@ function DHCPSClient(options) {
 
 DHCPSClient.prototype.start = function(callback) {
 	var packet = this.discover(1);
-	__SUPER__.prototype.start.call(() => {
+	__SUPER__.prototype.start.call(this, () => {
 		this.broadcast(packet, () => {
 			console.log('DHCPS Client: Broadcast sent');
 			hex(packet);
