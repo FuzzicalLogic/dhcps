@@ -219,13 +219,6 @@ function decodePacket(packet, rinfo) {
                 offset = readIp(packet, offset, msg, 'subnetMask');
                 break;
             }
-            /*case 2: {           // timeOffset
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 4);
-                msg.options.timeOffset = packet.readUInt32BE(offset);
-                offset += len;
-                break;
-            }*/
             case 3: {           // routerOption
                 var len = packet.readUInt8(offset++);
                 assert.strictEqual(len % 4, 0);
@@ -285,29 +278,6 @@ function decodePacket(packet, rinfo) {
                 offset = readIp(packet, offset, msg, 'requestedIpAddress');
                 break;
             }
-            case 51: {          // ipAddressLeaseTime
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 4);
-                msg.options.ipAddressLeaseTime =
-                    packet.readUInt32BE(offset);
-                offset += 4;
-                break;
-            }
-            case 52: {          // optionOverload
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 1);
-                msg.options.optionOverload = packet.readUInt8(offset++);
-                break;
-            }
-            /*case 53: {          // dhcpMessageType
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 1);
-                var mtype = packet.readUInt8(offset++);
-                assert.ok(1 <= mtype);
-                assert.ok(8 >= mtype);
-                msg.options.dhcpMessageType = DHCPSMessage.TYPES.get(mtype);
-                break;
-            }*/
             case 54: {          // serverIdentifier
                 offset = readIp(packet, offset, msg, 'serverIdentifier');
                 break;
@@ -319,27 +289,6 @@ function decodePacket(packet, rinfo) {
                     var option = packet.readUInt8(offset++);
                     msg.options.parameterRequestList.push(option);
                 }
-                break;
-            }
-            case 57: {          // maximumMessageSize
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 2);
-                msg.options.maximumMessageSize = packet.readUInt16BE(offset);
-                offset += len;
-                break;
-            }
-            case 58: {          // renewalTimeValue
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 4);
-                msg.options.renewalTimeValue = packet.readUInt32BE(offset);
-                offset += len;
-                break;
-            }
-            case 59: {          // rebindingTimeValue
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 4);
-                msg.options.rebindingTimeValue = packet.readUInt32BE(offset);
-                offset += len;
                 break;
             }
             case 60: {          // vendorClassIdentifier
@@ -415,34 +364,3 @@ function readAddressRaw(buffer, offset, len) {
 	}
 	return addr;
 }
-
-/*function addOptions() {
-	Object.defineProperty(DHCPSMessage.OPTIONS, 2, {
-		value: new __namespace__.MessageOption(
-			'timeOffset',
-			2,
-			5,
-			function(buffer, offset) {
-				assert.strictEqual(buffer.readUInt8(offset++), 4);
-				return buffer.readUInt32BE(offset) << 0;
-			},
-			function() {
-
-			}
-		)
-	});
-	Object.defineProperty(DHCPSMessage.OPTIONS, 53, {
-		value: new __namespace__.MessageOption(
-			'dhcpMessageType',
-			53,
-			2,
-			function(buffer, offset) {
-				assert.strictEqual(buffer.readUInt8(offset++), 1);
-				return DHCPSMessage.TYPES.get(buffer.readUInt8(offset));
-			},
-			function() {
-
-			}
-		)
-	});
-}*/
