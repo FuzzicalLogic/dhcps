@@ -416,7 +416,7 @@ function readAddressRaw(buffer, offset, len) {
 	return addr;
 }
 
-function addOptions() {
+/*function addOptions() {
 	Object.defineProperty(DHCPSMessage.OPTIONS, 2, {
 		value: new __namespace__.MessageOption(
 			'timeOffset',
@@ -445,4 +445,4 @@ function addOptions() {
 			}
 		)
 	});
-}
+}*/

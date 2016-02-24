@@ -1,13 +1,13 @@
 var __namespace__, Option;
 
-module.exports = (namespace, OptionClass) {
+module.exports = (namespace, OptionClass) => {
 	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
 	Option = OptionClass;
 
 	items.forEach((item) => {
-		var option = new OptionClass(
+		var option = new Option(
 			item.key,
 			item.value,
 			item.size,
@@ -51,4 +51,4 @@ var items = [{
 		write: function() {
 
 		}
-	}]
+	}];
