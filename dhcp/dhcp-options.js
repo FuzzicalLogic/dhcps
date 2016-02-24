@@ -72,7 +72,7 @@ var items = [{
 	},
 	{
 		key: 'maximumMessageSize',
-		value: 58,
+		value: 57,
 		size: 3,
 		read: function(buffer, offset) {
 			assert.strictEqual(buffer.readUInt8(offset++), 2);
