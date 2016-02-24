@@ -1,9 +1,7 @@
-var __namespace__, Option;
+var Message, Option;
 
-module.exports = (namespace, OptionClass) => {
-	__namespace__ = 'object' === typeof namespace
-		? namespace
-		: Object.create(null);
+module.exports = (MessageClass, OptionClass) => {
+	Message = MessageClass;
 	Option = OptionClass;
 
 	items.forEach((item) => {
@@ -46,7 +44,7 @@ var items = [{
 		size: 2,
 		read: function(buffer, offset) {
 			assert.strictEqual(buffer.readUInt8(offset++), 1);
-			return DHCPSMessage.TYPES.get(buffer.readUInt8(offset));
+			return Message.TYPES.get(buffer.readUInt8(offset));
 		},
 		write: function() {
 
