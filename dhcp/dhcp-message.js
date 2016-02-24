@@ -7,7 +7,7 @@ module.exports = (namespace, EnumClass, protocol) => {
 		: Object.create(null);
 	Enum = EnumClass;
 	_protocol_ = protocol;
-	addOptions();
+	//addOptions();
 
 	DHCPSMessage.TYPES = Object.freeze(new Enum()
 		.add('DHCP_DISCOVER', 1)
