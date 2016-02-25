@@ -254,14 +254,14 @@ function decodePacket(packet, rinfo) {
                 }
                 break;
             }
-            case 12: {          // hostName
+            /*case 12: {          // hostName
                 offset = readString(packet, offset, msg, 'hostName');
                 break;
             }
             case 15: {          // domainName
                 offset = readString(packet, offset, msg, 'domainName');
                 break;
-            }
+            }*/
             case 43: {          // vendorOptions
                 var len = packet.readUInt8(offset++);
                 msg.options.vendorOptions = {};
@@ -292,10 +292,10 @@ function decodePacket(packet, rinfo) {
                 }
                 break;
             }
-            case 60: {          // vendorClassIdentifier
+            /*case 60: {          // vendorClassIdentifier
                 offset = readString(packet, offset, msg, 'vendorClassIdentifier');
                 break;
-            }
+            }*/
             case 61: {          // clientIdentifier
                 var len = packet.readUInt8(offset++);
                 msg.options.clientIdentifier =

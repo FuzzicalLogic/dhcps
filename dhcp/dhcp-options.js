@@ -27,51 +27,15 @@ module.exports = (MessageClass, OptionClass) => {
 
 var assert = require('assert');
 var options = {};
-var items = [{
-		key: 'timeOffset',
-		value: 2,
-		size: 4,
-		read: function(buffer, offset) {
-			assert.strictEqual(buffer.readUInt8(offset++), 4);
-			return {
-				length: 5,
-				value: buffer.readUInt32BE(offset) << 0
-			};
-		},
-		write: function() {
-
-		},
-		type: 'uint'
-	},
+var items = [
+	{ value: 2, key: 'timeOffset', type: 'uint', size: 4 },
+	{ value: 12, key: 'hostName', type: 'string', size: 0 },
+	{ value: 15, key: 'domainName', type: 'string', size: 0 },
+	{ value: 51, key: 'ipAddressLeaseTime', type: 'uint', size: 4 },
+	{ value: 52, key: 'optionOverload', type: 'uint', size: 1 },
 	{
-		key: 'ipAddressLeaseTime',
-		value: 51,
-		size: 4,
-		read: function(buffer, offset) {
-			assert.strictEqual(buffer.readUInt8(offset++), 4);
-			return {
-				length: 5,
-				value: buffer.readUInt32BE(offset)
-			};
-		},
-		write: function() {}
-	},
-	{
-		key: 'optionOverload',
-		value: 52,
-		size: 1,
-		read: function(buffer, offset) {
-			assert.strictEqual(buffer.readUInt8(offset++), 1);
-			return {
-				length: 2,
-				value: buffer.readUInt8(offset)
-			};
-		},
-		write: function() {}
-	},
-	{
-		key: 'dhcpMessageType',
 		value: 53,
+		key: 'dhcpMessageType',
 		size: 1,
 		read: function(buffer, offset) {
 			assert.strictEqual(buffer.readUInt8(offset++), 1);
@@ -84,48 +48,8 @@ var items = [{
 
 		}
 	},
-	{
-		key: 'maximumMessageSize',
-		value: 57,
-		size: 2,
-		read: function(buffer, offset) {
-			assert.strictEqual(buffer.readUInt8(offset++), 2);
-			return {
-				length: 3,
-				value: buffer.readUInt16BE(offset)
-			};
-		},
-		write: function() {
-
-		}
-	},
-	{
-		key: 'renewalTimeValue',
-		value: 58,
-		size: 4,
-		read: function(buffer, offset) {
-			assert.strictEqual(buffer.readUInt8(offset++), 4);
-			return {
-				length: 5,
-				value: buffer.readUInt32BE(offset)
-			};
-		},
-		write: function() {
-
-		}
-	},
-	{
-		key: 'rebindingTimeValue',
-		value: 59,
-		size: 4,
-		read: function(buffer, offset) {
-			assert.strictEqual(buffer.readUInt8(offset++), 4);
-			return {
-				length: 5,
-				value: buffer.readUInt32BE(offset)
-			};
-		},
-		write: function() {
-
-		}
-	}];
+	{ value: 57, key: 'maximumMessageSize', type: 'uint', size: 2 },
+	{ value: 58, key: 'renewalTimeValue', type: 'uint', size: 4	},
+	{ value: 59, key: 'rebindingTimeValue', type: 'uint', size: 4 },
+	{ value: 60, key: 'vendorClassIdentifier', type: 'string', size: 0 }
+];

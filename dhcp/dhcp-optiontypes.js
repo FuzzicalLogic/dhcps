@@ -18,7 +18,9 @@ var types = {};
 var items = [
 	{	name: 'fixed',
 		getData: function() {
-
+			return {
+				length: 0, data: undefined
+			}
 		},
 		putData: function() {
 
@@ -54,8 +56,14 @@ var items = [
 		}
 	},
 	{	name: 'string',
-		getData: function() {
+		getData: function(buffer, offset) {
+			var data,
+				len = this.readLength(buffer, offset++);
 
+			return {
+				length: len + 1,
+				data: buffer.toString('ascii', offset, offset + len)
+			};
 		},
 		putData: function() {
 
