@@ -38,12 +38,12 @@ function DHCPOption(key, value, size, fnRead, fnWrite, type) {
 		attribute(this, key, config[key]);
 	});
 
-	this.read = !!type && !!type.getData
+	this.read = (!!type && !!type.getData)
 		? type.getData
 		: fnRead || function(buffer, offset) {
 
 		};
-	this.write = !!type && !!type.getData
+	this.write = (!!type && !!type.getData)
 		? type.getData
 		: fnRead || function(buffer, offset) {
 

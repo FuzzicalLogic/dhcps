@@ -15,12 +15,8 @@ module.exports = (namespace) => {
 __class__.prototype = Object.create(null);
 function DHCPOptionType(name, read, write) {
 	this.name = name;
-	this.read = (buffer) => {
-		read.call(this, buffer);
-	};
-	this.write = (buffer) => {
-		write.call(this, buffer);
-	};
+	this.getData = read;
+	this.putData = write;
 }
 __proto__.toBuffer = function(option, buffer, offset) {
 

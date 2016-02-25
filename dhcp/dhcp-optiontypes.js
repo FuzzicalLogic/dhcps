@@ -6,7 +6,7 @@ module.exports = (OptionTypeClass) => {
 
 	items.forEach((i) => {
 		Object.defineProperty(types, i.name, {
-			value: new OptionType(i.name, i.read, i.write)
+			value: new OptionType(i.name, i.getData, i.putData)
 		});
 	});
 
