@@ -22,7 +22,7 @@ var hex = require('hex');
 
 function DHCPSClient(options) {
 	options = options || { };
-	options.hostname = options.hostname || 'client.ntmobiledev.local';
+	options.hostName = options.hostName || 'client.ntmobiledev.local';
 	options.address = options.address || '127.0.0.1';
 	options.port = options.port || 68;
 
@@ -34,6 +34,7 @@ DHCPSClient.prototype.start = function(callback) {
 	__super__.prototype.start.call(this, () => {
 		this.broadcast(packet, () => {
 			console.log('DHCPS Client: Broadcast sent');
+			hex(packet)
 		});
 
 		if (typeof callback === 'function')
@@ -50,6 +51,7 @@ DHCPSClient.prototype.discover = function(xid) {
 		pkt = new Buffer(1500);
 	msg.options.timeOffset = -3600 >>> 0;
 	msg.options.hostName = 'ntmobiledev';
+	msg.options.serverIdentifier = '10.11.12.13';
 	return msg.encode(pkt);
 }
 

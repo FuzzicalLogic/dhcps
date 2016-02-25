@@ -14,7 +14,6 @@ module.exports = (namespace) => {
 
 __class__.prototype = Object.create(null);
 function DHCPOptionType(name, read, write) {
-	console.log('New Type defined: ' + name);
 	this.name = name;
 	this.getData = read;
 	this.putData = write;

@@ -28,9 +28,11 @@ module.exports = (MessageClass, OptionClass) => {
 var assert = require('assert');
 var options = {};
 var items = [
+	{ value: 1, key: 'subnetMask', type: 'ipaddress', size: 4},
 	{ value: 2, key: 'timeOffset', type: 'uint', size: 4 },
 	{ value: 12, key: 'hostName', type: 'string', size: 0 },
 	{ value: 15, key: 'domainName', type: 'string', size: 0 },
+	{ value: 50, key: 'requestedIpAddress', type: 'ipaddress', size: 4},
 	{ value: 51, key: 'ipAddressLeaseTime', type: 'uint', size: 4 },
 	{ value: 52, key: 'optionOverload', type: 'uint', size: 1 },
 	{
@@ -48,8 +50,12 @@ var items = [
 
 		}
 	},
+	{ value: 54, key: 'serverIdentifier', type: 'ipaddress', size: 4},
 	{ value: 57, key: 'maximumMessageSize', type: 'uint', size: 2 },
 	{ value: 58, key: 'renewalTimeValue', type: 'uint', size: 4	},
 	{ value: 59, key: 'rebindingTimeValue', type: 'uint', size: 4 },
-	{ value: 60, key: 'vendorClassIdentifier', type: 'string', size: 0 }
+	{ value: 60, key: 'vendorClassIdentifier', type: 'string', size: 0 },
+	//{ value: 81, key: 'fullyQualifiedDomainName', type: 'string', size: 0 }
+	{ value: 118, key: 'subnetSelection', type: 'ipaddress', size: 4}
+
 ];

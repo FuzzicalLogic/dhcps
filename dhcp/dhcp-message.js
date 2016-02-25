@@ -61,7 +61,6 @@ function DHCPSMessage(xid, msgtype) {
 	});
 
 	this.on('chaddrChanged', (newValue, oldValue) => {
-		console.log('ChAddr has Changed: ' + newValue);
 		/*this.hw(new Buffer(newValue.split(':').map((part) => {
 	        return parseInt(part, 16);
 	    })));*/
@@ -116,7 +115,7 @@ function encodeMessage(packet) {
     if ('requestedIpAddress' in this.options) {
         packet.writeUInt8(50, i++); // option 50
         var requestedIpAddress = new Buffer(
-            new v4.Address(this.options.requestedIpAddress).toArray());
+            new V4Address(this.options.requestedIpAddress).toArray());
         packet.writeUInt8(requestedIpAddress.length, i++);
         requestedIpAddress.copy(packet, i); i += requestedIpAddress.length;
     }
@@ -128,7 +127,9 @@ function encodeMessage(packet) {
     }
 	if ('hostName' in this.options) {
 		packet.writeUInt8(12, i++);
+		console.log('Write ' + this.options.hostName.length + ' to: ' + i.toString(16));
 		packet.writeUInt8(this.options.hostName.length, i++);
+		console.log('Write ' + this.options.hostName + ' to: ' + i.toString(16));
 		packet.write(this.options.hostName, i, this.options.hostName.length, 'ascii');
 		i += this.options.hostName.length;
 	}
@@ -140,7 +141,7 @@ function encodeMessage(packet) {
     if ('serverIdentifier' in this.options) {
         packet.writeUInt8(54, i++); // option 54
         var serverIdentifier = new Buffer(
-            new v4.Address(this.options.serverIdentifier).toArray());
+            new V4Address(this.options.serverIdentifier).toArray());
         packet.writeUInt8(serverIdentifier.length, i++);
         serverIdentifier.copy(packet, i); i += serverIdentifier.length;
     }
@@ -212,6 +213,7 @@ function decodePacket(packet, rinfo) {
     var code = 0;
     while (code != 255 && offset < packet.length) {
         code = packet.readUInt8(offset++);
+	// If the code is supported, it will have its own read function
 		if (DHCPSMessage.OPTIONS.hasOwnProperty(code)) {
 			var option = DHCPSMessage.OPTIONS[code],
 				data = option.read(packet, offset);
@@ -222,10 +224,6 @@ function decodePacket(packet, rinfo) {
 		else switch (code) {
             case 0: continue;   // pad
             case 255: break;    // end
-            case 1: {           // subnetMask
-                offset = readIp(packet, offset, msg, 'subnetMask');
-                break;
-            }
             case 3: {           // routerOption
                 var len = packet.readUInt8(offset++);
                 assert.strictEqual(len % 4, 0);
@@ -260,14 +258,6 @@ function decodePacket(packet, rinfo) {
                 }
                 break;
             }
-            /*case 12: {          // hostName
-                offset = readString(packet, offset, msg, 'hostName');
-                break;
-            }
-            case 15: {          // domainName
-                offset = readString(packet, offset, msg, 'domainName');
-                break;
-            }*/
             case 43: {          // vendorOptions
                 var len = packet.readUInt8(offset++);
                 msg.options.vendorOptions = {};
@@ -281,14 +271,6 @@ function decodePacket(packet, rinfo) {
                 }
                 break;
             }
-            case 50: {          // requestedIpAddress
-                offset = readIp(packet, offset, msg, 'requestedIpAddress');
-                break;
-            }
-            case 54: {          // serverIdentifier
-                offset = readIp(packet, offset, msg, 'serverIdentifier');
-                break;
-            }
             case 55: {          // parameterRequestList
                 var len = packet.readUInt8(offset++);
                 msg.options.parameterRequestList = [];
@@ -298,10 +280,6 @@ function decodePacket(packet, rinfo) {
                 }
                 break;
             }
-            /*case 60: {          // vendorClassIdentifier
-                offset = readString(packet, offset, msg, 'vendorClassIdentifier');
-                break;
-            }*/
             case 61: {          // clientIdentifier
                 var len = packet.readUInt8(offset++);
                 msg.options.clientIdentifier =
@@ -318,10 +296,6 @@ function decodePacket(packet, rinfo) {
                     name: packet.toString('ascii', offset + 3, offset + len)
                 };
                 offset += len;
-                break;
-            }
-            case 118: {		    // subnetSelection
-                offset = readIp(packet, offset, msg, 'subnetAddress');
                 break;
             }
             default: {

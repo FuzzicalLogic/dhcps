@@ -28,16 +28,21 @@ var items = [
 	},
 	{	name: 'uint',
 		getData: function(buffer, offset) {
+			console.log('Reading option at: ' + offset.toString(16));
 			var data,
-				len = this.readLength(buffer, +offset++);
+			// Cast, in case, a numeric string or property is sent.
+				pos = +offset;
+			console.log('Length at: ' + pos.toString(16));
+			var len = this.readLength(buffer, pos++);
+			console.log('Length: ' + len.toString(16));
 
-			console.log('uint data');
+			console.log('Value at: ' + pos.toString(16));
 			if (+this.size === 4)
-				data = buffer.readUInt32BE(buffer, +offset);
+				data = buffer.readUInt32BE(pos);
 			else if (+this.size === 2)
-				data = buffer.readUInt16BE(buffer, +offset);
+				data = buffer.readUInt16BE(pos);
 			else if (+this.size === 1)
-				data = buffer.readUInt8(buffer, +offset);
+				data = buffer.readUInt8(pos);
 
 			return {
 				length: len + 1,
@@ -49,8 +54,21 @@ var items = [
 		}
 	},
 	{	name: 'ipaddress',
-		getData: function() {
+		getData: function(buffer, offset) {
+			var i, data,
+			// Cast in the case that a numeric string or property is sent.
+				pos = +offset,
+				len = this.readLength(buffer, pos++);
 
+			var segments = [];
+			for (i = 0; i < 4; i++)
+				segments.push(buffer.readUInt8(pos + i));
+			data = segments.join('.');
+
+			return {
+				length: len + 1,
+				value: data
+			};
 		},
 		putData: function() {
 
@@ -58,13 +76,13 @@ var items = [
 	},
 	{	name: 'string',
 		getData: function(buffer, offset) {
-			var data,
-				len = this.readLength(buffer, offset++);
+		// Cast in the case that a numeric string or property is sent.
+			var pos = +offset,
+				len = this.readLength(buffer, pos++);
 
-			console.log('string data');
 			return {
 				length: len + 1,
-				value: buffer.toString('ascii', offset, offset + len)
+				value: buffer.toString('ascii', pos, pos + len)
 			};
 		},
 		putData: function() {

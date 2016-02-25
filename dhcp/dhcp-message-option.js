@@ -43,13 +43,14 @@ function DHCPOption(key, value, size, fnRead, fnWrite, type) {
 		: fnRead || function(buffer, offset) {
 
 		};
-	this.write = (!!type && !!type.getData)
-		? type.getData
+	this.write = (!!type && !!type.putData)
+		? type.putData
 		: fnRead || function(buffer, offset) {
 
 		};
 }
 DHCPOption.prototype.readLength = function(buffer, offset) {
-	return buffer.readUInt8(buffer, +offset);
+	console.log('Length at: ' + offset.toString(16));
+	return buffer.readUInt8(offset);
 };
 DHCPOption.TYPES = {}

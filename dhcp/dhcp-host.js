@@ -51,7 +51,7 @@ function DHCPHost(opts) {
 	});
 
 	this.on('addressChanged', () => {
-		console.log('DHCP Host\'s address has changed');
+		
 	});
 
     this.socket = dgram.createSocket('udp4');
