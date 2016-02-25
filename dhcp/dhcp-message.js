@@ -126,6 +126,12 @@ function encodeMessage(packet) {
         packet.writeUInt32BE(this.options.timeOffset, i);
 		i += 4;
     }
+	if ('hostName' in this.options) {
+		packet.writeUInt8(12, i++);
+		packet.writeUInt8(this.options.hostName.length, i++);
+		packet.write(this.options.hostName, i, this.options.hostName.length, 'ascii');
+		i += this.options.hostName.length;
+	}
     if ('dhcpMessageType' in this.options) {
         packet.writeUInt8(53, i++); // option 53
         packet.writeUInt8(1, i++);  // length
