@@ -8,13 +8,12 @@ module.exports = (namespace) => {
 		? namespace
 		: Object.create(null);
 
-	return DHCPAMessageOption;
+	return DHCPOption;
 }
 
 
-
-
-function DHCPAMessageOption(key, value, size, fnRead, fnWrite) {
+DHCPOption.prototype = Object.create(null);
+function DHCPOption(key, value, size, fnRead, fnWrite, type) {
 	var config = {
 		value: {
 			initial: value,
@@ -39,36 +38,18 @@ function DHCPAMessageOption(key, value, size, fnRead, fnWrite) {
 		attribute(this, key, config[key]);
 	});
 
+	this.read = !!type && !!type.getData
+		? type.getData
+		: fnRead || function(buffer, offset) {
 
-	this.read = fnRead || function(buffer, offset) {
+		};
+	this.write = !!type && !!type.getData
+		? type.getData
+		: fnRead || function(buffer, offset) {
 
-	};
-	this.write = fnWrite || function(buffer, offset) {
-
-	};
-
+		};
 }
-DHCPAMessageOption.TYPES = Object.create(null)
-
-DHCPAMessageOption.prototype = Object.create(null);
-
-
-
-function DHCPAMessageOptionType(name, value, size, read, write) {
-	this.name = name;
-	this.value = value;
-	this.size = size;
-	this.read = (buffer) => {
-		read.call(this, buffer);
-	};
-	this.write = (buffer) => {
-		write.call(this, buffer);
-	};
-}
-DHCPAMessageOption.prototype = Object.create(null);
-DHCPAMessageOption.prototype.valueOf = function() {
-	return this.value;
-}
-DHCPAMessageOption.prototype.toString = function() {
-	return this.name;
+DHCPOption.prototype.readLength = function(buffer, offset) {
+	return buffer.readUInt8(buffer, +offset);
 };
+DHCPOption.TYPES = {}

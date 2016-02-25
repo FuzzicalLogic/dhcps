@@ -16,6 +16,11 @@ Object.defineProperty(__namespace__, 'DHCP', {
 		value: require('./dhcp/dhcp-message-option')
 			(__namespace__.DHCP)
 	});
+	Object.defineProperty(__namespace__.DHCP, 'TYPES', {
+		value: require('./dhcp/dhcp-optiontypes')
+			(__namespace__.DHCP.MessageOption)
+	});
+
 	Object.defineProperty(__namespace__.DHCP, 'Message', {
 		value: require('./dhcp/dhcp-message')
 			(__namespace__.DHCP, Enum, __namespace__.protocol)

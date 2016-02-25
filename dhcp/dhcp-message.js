@@ -207,9 +207,10 @@ function decodePacket(packet, rinfo) {
     while (code != 255 && offset < packet.length) {
         code = packet.readUInt8(offset++);
 		if (DHCPSMessage.OPTIONS.hasOwnProperty(code)) {
-			var option = DHCPSMessage.OPTIONS[code];
-			msg.options[option.key()] = option.read(packet, offset);
-			offset += option.size();
+			var option = DHCPSMessage.OPTIONS[code],
+				data = option.read(packet, offset);
+			msg.options[option.key()] = data.value;
+			offset += data.length;
 			console.log('Option Found: ' + option.key + '(' + msg.options[option.key()]+ ')');
 		}
 		else switch (code) {
