@@ -31,6 +31,7 @@ var items = [
 			var data,
 				len = this.readLength(buffer, +offset++);
 
+			console.log('uint data');
 			if (+this.size === 4)
 				data = buffer.readUInt32BE(buffer, +offset);
 			else if (+this.size === 2)
@@ -60,6 +61,7 @@ var items = [
 			var data,
 				len = this.readLength(buffer, offset++);
 
+			console.log('string data');
 			return {
 				length: len + 1,
 				value: buffer.toString('ascii', offset, offset + len)
