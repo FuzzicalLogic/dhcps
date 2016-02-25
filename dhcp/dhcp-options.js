@@ -11,7 +11,7 @@ module.exports = (MessageClass, OptionClass) => {
 			item.size,
 			item.read,
 			item.write,
-			item.type
+			Option.TYPES[item.type]
 		);
 
 		Object.defineProperty(options, item.key, {
@@ -41,7 +41,7 @@ var items = [{
 		write: function() {
 
 		},
-		type: Option.TYPES.uint
+		type: 'uint'
 	},
 	{
 		key: 'ipAddressLeaseTime',
