@@ -49,7 +49,7 @@ DHCPSClient.prototype.discover = function(xid) {
 	var msg = new Message(xid, +MSGTYPES.DHCP_DISCOVER),
 		pkt = new Buffer(1500);
 	msg.options.timeOffset = -3600 >>> 0;
-	msg.options.hostname = 'ntmobiledev';
+	msg.options.hostName = 'ntmobiledev';
 	return msg.encode(pkt);
 }
 
