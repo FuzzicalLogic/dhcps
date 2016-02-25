@@ -40,7 +40,8 @@ var items = [{
 		},
 		write: function() {
 
-		}
+		},
+		type: Option.TYPES.uint
 	},
 	{
 		key: 'ipAddressLeaseTime',
