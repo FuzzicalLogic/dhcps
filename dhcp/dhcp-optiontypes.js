@@ -62,7 +62,7 @@ var items = [
 
 			return {
 				length: len + 1,
-				data: buffer.toString('ascii', offset, offset + len)
+				value: buffer.toString('ascii', offset, offset + len)
 			};
 		},
 		putData: function() {
