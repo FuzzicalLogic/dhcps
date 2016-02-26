@@ -28,26 +28,28 @@ var items = [
 	},
 	{	name: 'uint',
 		getData: function(buffer, offset) {
-			console.log('Reading option at: ' + offset.toString(16));
-			var data,
+			var i, data = [],
 			// Cast, in case, a numeric string or property is sent.
-				pos = +offset;
-			console.log('Length at: ' + pos.toString(16));
-			var len = this.readLength(buffer, pos++);
-			console.log('Length: ' + len.toString(16));
+				pos = +offset, sz = +this.size,
+				len = this.readLength(buffer, pos++);
 
-			console.log('Value at: ' + pos.toString(16));
-			if (+this.size === 4)
-				data = buffer.readUInt32BE(pos);
-			else if (+this.size === 2)
-				data = buffer.readUInt16BE(pos);
-			else if (+this.size === 1)
-				data = buffer.readUInt8(pos);
+			for (i = 0; i < len; i += sz) {
+				data.push(readUInteger(buffer, pos, sz));
+				pos += sz;
+			}
 
 			return {
 				length: len + 1,
-				value: data
+				value: (data.length > 1) ? data : data[0]
 			};
+
+			function readUInteger(buffer, offset, size) {
+				return (size === 4)
+					? buffer.readUInt32BE(offset)
+					: (size === 2)
+						? buffer.readUInt16BE(offset)
+						: buffer.readUInt8(offset);
+			}
 		},
 		putData: function() {
 
@@ -55,20 +57,26 @@ var items = [
 	},
 	{	name: 'ipaddress',
 		getData: function(buffer, offset) {
-			var i, data,
+			var i, data = [],
 			// Cast in the case that a numeric string or property is sent.
 				pos = +offset,
 				len = this.readLength(buffer, pos++);
 
-			var segments = [];
-			for (i = 0; i < 4; i++)
-				segments.push(buffer.readUInt8(pos + i));
-			data = segments.join('.');
+			for (i = 0; i < len; i += 4) {
+				data.push(readIPAddress(buffer, pos));
+			}
 
 			return {
 				length: len + 1,
-				value: data
+				value: (data.length > 1) ? data : data[0]
 			};
+
+			function readIPAddress(buffer, offset) {
+				var segments = [];
+				for (i = 0; i < 4; i++)
+					segments.push(buffer.readUInt8(offset + i));
+				data = segments.join('.');
+			}
 		},
 		putData: function() {
 
