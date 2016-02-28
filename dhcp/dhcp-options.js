@@ -17,7 +17,7 @@ module.exports = (MessageClass, OptionClass) => {
 		Object.defineProperty(options, item.key, {
 			value: option
 		});
-		Object.defineProperty(options, item.value, {
+		Object.defineProperty(options, item.code, {
 			value: option
 		});
 	});
@@ -54,8 +54,14 @@ var items = [
 				value: Message.TYPES.get(buffer.readUInt8(offset))
 			};
 		},
-		write: function() {
+		write: function(buffer, offset, value) {
+			var pos = +offset;
 
+			buffer.writeUInt8(+this.code, pos++);
+			buffer.writeUInt8(+this.size, pos++);
+			buffer.writeUInt8(value, pos);
+
+			return 3;
 		}
 	},
 	{ code: 54, key: 'serverIdentifier', type: 'ipaddress', size: 4},

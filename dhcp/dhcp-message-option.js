@@ -15,7 +15,7 @@ module.exports = (namespace) => {
 DHCPOption.prototype = Object.create(null);
 function DHCPOption(key, value, size, fnRead, fnWrite, type) {
 	var config = {
-		value: {
+		code: {
 			initial: value,
 			validator: (v) => {
 				return 'number' === typeof v;
@@ -45,7 +45,7 @@ function DHCPOption(key, value, size, fnRead, fnWrite, type) {
 		};
 	this.write = (!!type && !!type.putData)
 		? type.putData
-		: fnRead || function(buffer, offset) {
+		: fnWrite || function(buffer, offset) {
 
 		};
 }

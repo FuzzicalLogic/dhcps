@@ -17,14 +17,8 @@ var assert = require('assert');
 var types = {};
 var items = [
 	{	name: 'fixed',
-		getData: function() {
-			return {
-				length: 0, data: undefined
-			}
-		},
-		putData: function() {
-
-		}
+		getData: function() { return { length: 0, data: undefined }; },
+		putData: function(buffer, offset, value) { return 0; }
 	},
 	{	name: 'uint',
 		getData: function(buffer, offset) {
@@ -51,8 +45,21 @@ var items = [
 						: buffer.readUInt8(offset);
 			}
 		},
-		putData: function() {
+		putData: function(buffer, offset, value) {
+			var written = 0,
+				pos = +offset,
+				size = +this.size;
 
+			pos = offset + (written += (buffer.writeUInt8(+this.code, pos) - pos));
+			pos = offset + (written += (buffer.writeUInt8(size, pos) - pos));
+
+			pos = offset + (written += ((size === 4)
+				? buffer.writeUInt32BE(value, pos)
+				: (size === 2)
+					? buffer.writeUInt16BE(value, pos)
+					: buffer.writeUInt8(value, pos)) - pos);
+			console.log('Setting DHCP Option: ' + this.key + '(' + value + ') - ' + written + 'B');
+			return written;
 		}
 	},
 	{	name: 'ipaddress',
@@ -78,8 +85,9 @@ var items = [
 				data = segments.join('.');
 			}
 		},
-		putData: function() {
-
+		putData: function(buffer, offset, value) {
+			console.log('Setting DHCP Option: ' + this.key + '(' + value + ')');
+			return 0;
 		}
 	},
 	{	name: 'string',
@@ -93,8 +101,19 @@ var items = [
 				value: buffer.toString('ascii', pos, pos + len)
 			};
 		},
-		putData: function() {
+		putData: function(buffer, offset, value) {
+			var written = 0,
+				pos = +offset,
+				len = +((''+value).length),
+				size = +this.size;
 
+			pos = offset + (written += (buffer.writeUInt8(+this.code, pos) - pos));
+			pos = offset + (written += (buffer.writeUInt8(len, pos) - pos));
+
+			pos = offset + (written += buffer.write(value, pos, len, 'ascii'));
+
+			console.log('Setting DHCP Option: ' + this.key + '(' + value + ') - ' + written + 'B');
+			return written;
 		}
 	}
 ];

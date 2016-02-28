@@ -77,6 +77,11 @@ DHCPSMessage.OPTIONS = {};
 
 //DHCPSMessage.prototype = Object.create(null);
 DHCPSMessage.prototype.encode = encodeMessage;
+DHCPSMessage.prototype.option = setOption;
+
+function setOption(option, value) {
+
+}
 
 function encodeMessage(packet) {
 
@@ -112,31 +117,17 @@ function encodeMessage(packet) {
     packet.fill(0, i, i + 192); i += 192;
     packet.writeUInt32BE(0x63825363, i); i += 4;
 
+	Object.keys(this.options).forEach((opt) => {
+		if (opt in DHCPSMessage.OPTIONS)
+			i += DHCPSMessage.OPTIONS[opt].write(packet, i, this.options[opt]);
+	});
+
     if ('requestedIpAddress' in this.options) {
         packet.writeUInt8(50, i++); // option 50
         var requestedIpAddress = new Buffer(
             new V4Address(this.options.requestedIpAddress).toArray());
         packet.writeUInt8(requestedIpAddress.length, i++);
         requestedIpAddress.copy(packet, i); i += requestedIpAddress.length;
-    }
-	if ('timeOffset' in this.options) {
-		packet.writeUInt8(2, i++);
-        packet.writeUInt8(4, i++); // option 50
-        packet.writeUInt32BE(this.options.timeOffset, i);
-		i += 4;
-    }
-	if ('hostName' in this.options) {
-		packet.writeUInt8(12, i++);
-		console.log('Write ' + this.options.hostName.length + ' to: ' + i.toString(16));
-		packet.writeUInt8(this.options.hostName.length, i++);
-		console.log('Write ' + this.options.hostName + ' to: ' + i.toString(16));
-		packet.write(this.options.hostName, i, this.options.hostName.length, 'ascii');
-		i += this.options.hostName.length;
-	}
-    if ('dhcpMessageType' in this.options) {
-        packet.writeUInt8(53, i++); // option 53
-        packet.writeUInt8(1, i++);  // length
-        packet.writeUInt8(this.options.dhcpMessageType, i++);
     }
     if ('serverIdentifier' in this.options) {
         packet.writeUInt8(54, i++); // option 54
@@ -201,13 +192,6 @@ function decodePacket(packet, rinfo) {
 		  .magic(packet.readUInt32BE(236));
 
 	msg.options = {};
-
-    /*var p = {
-        chaddr: __namespace__.protocol.createHardwareAddress(
-                    __namespace__.protocol.ARPHardwareType.get(packet.readUInt8(1)),
-                    readAddressRaw(packet, 28, packet.readUInt8(2))),
-    };
-	*/
 
     var offset = 240;
     var code = 0;
