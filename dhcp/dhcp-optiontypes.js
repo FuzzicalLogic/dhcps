@@ -64,13 +64,13 @@ var items = [
 	},
 	{	name: 'ipaddress',
 		getData: function(buffer, offset) {
-			var i, data = [],
+			var data = [],
 			// Cast in the case that a numeric string or property is sent.
 				pos = +offset,
 				len = this.readLength(buffer, pos++);
 
-			for (i = 0; i < len; i += 4) {
-				data.push(readIPAddress(buffer, pos));
+			for (var i = 0; i < len; i += 4) {
+				data.push(readIPAddress(buffer, pos + i));
 			}
 
 			return {
@@ -79,15 +79,40 @@ var items = [
 			};
 
 			function readIPAddress(buffer, offset) {
-				var segments = [];
-				for (i = 0; i < 4; i++)
-					segments.push(buffer.readUInt8(offset + i));
-				data = segments.join('.');
+				return [0,0,0,0].map((v, k, a) => {
+					return buffer.readUInt8(offset + k);
+				}).join('.');
 			}
 		},
 		putData: function(buffer, offset, value) {
+			var written = 0,
+				pos = +offset,
+				size = +this.size;
+
+			pos = offset + (written += (buffer.writeUInt8(+this.code, pos) - pos));
+			if (value.length && 'function' === typeof value.forEach) {
+				pos = offset + (written += (buffer.writeUInt8(4 * value.length, pos) - pos));
+				value.forEach((address) => {
+					pos = offset + (written += writeIPAddress(buffer, pos, address));
+				});
+			}
+			else {
+				pos = offset + (written += (buffer.writeUInt8(4, pos) - pos));
+				written += writeIPAddress(buffer, pos, value);
+			}
+
 			console.log('Setting DHCP Option: ' + this.key + '(' + value + ')');
-			return 0;
+			return written;
+
+			function writeIPAddress(buffer, offset, value) {
+				var written = 0,
+					pos = +offset;
+
+				value.split('.').forEach((segment) => {
+					pos = offset + (written += buffer.writeUInt8(segment, pos) - pos);
+				});
+				return written;
+			}
 		}
 	},
 	{	name: 'string',
@@ -117,3 +142,13 @@ var items = [
 		}
 	}
 ];
+
+function writeUInt8(buffer, offset, value) {
+	return buffer.writeUInt8(value, offset) - offset;
+}
+function writeUInt16(buffer, offset, value) {
+	return buffer.writeUInt16BE(value, offset) - offset;
+}
+function writeUInt32(buffer, offset, value) {
+	return buffer.writeUInt32BE(value, offset) - offset;
+}

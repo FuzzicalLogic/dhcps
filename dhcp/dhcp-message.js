@@ -122,20 +122,6 @@ function encodeMessage(packet) {
 			i += DHCPSMessage.OPTIONS[opt].write(packet, i, this.options[opt]);
 	});
 
-    if ('requestedIpAddress' in this.options) {
-        packet.writeUInt8(50, i++); // option 50
-        var requestedIpAddress = new Buffer(
-            new V4Address(this.options.requestedIpAddress).toArray());
-        packet.writeUInt8(requestedIpAddress.length, i++);
-        requestedIpAddress.copy(packet, i); i += requestedIpAddress.length;
-    }
-    if ('serverIdentifier' in this.options) {
-        packet.writeUInt8(54, i++); // option 54
-        var serverIdentifier = new Buffer(
-            new V4Address(this.options.serverIdentifier).toArray());
-        packet.writeUInt8(serverIdentifier.length, i++);
-        serverIdentifier.copy(packet, i); i += serverIdentifier.length;
-    }
     if ('parameterRequestList' in this.options) {
         packet.writeUInt8(55, i++); // option 55
         var parameterRequestList = new Buffer(this.options.parameterRequestList);

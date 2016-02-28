@@ -52,6 +52,12 @@ DHCPSClient.prototype.discover = function(xid) {
 	msg.options.timeOffset = -3600 >>> 0;
 	msg.options.hostName = 'ntmobiledev';
 	msg.options.serverIdentifier = '10.11.12.13';
+	msg.options.requestedIpAddress = '14.15.16.17';
+	msg.options.routerOption = [
+		'1.2.3.4',
+		'5.6.7.8',
+		'9.10.11.12'
+	];
 	return msg.encode(pkt);
 }
 
