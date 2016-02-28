@@ -1,3 +1,0 @@
-[submodule "documents"]
-	path = documents
-	url = git://github.com/fuzzicallogic/dhcps.wiki.git
