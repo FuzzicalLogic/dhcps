@@ -42,6 +42,7 @@ var items = [
 	{ code: 12, key: 'hostName', type: 'string', size: 0 },
 	{ code: 15, key: 'domainName', type: 'string', size: 0 },
 	{ code: 16, key: 'swapServerOption', type: 'ipaddress', size: 1 },
+	{ code: 25, key: 'pathMTU', type: 'uint', size: 2 },
 	{ code: 50, key: 'requestedIpAddress', type: 'ipaddress', size: 1 },
 	{ code: 51, key: 'ipAddressLeaseTime', type: 'uint', size: 4 },
 	{ code: 52, key: 'optionOverload', type: 'uint', size: 1 },

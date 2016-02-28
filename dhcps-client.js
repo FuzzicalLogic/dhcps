@@ -58,6 +58,7 @@ DHCPSClient.prototype.discover = function(xid) {
 		'5.6.7.8',
 		'9.10.11.12'
 	];
+	msg.options.pathMTU = [0xAAAA,0xBBBB];
 	return msg.encode(pkt);
 }
 

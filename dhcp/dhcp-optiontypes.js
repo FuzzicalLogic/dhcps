@@ -65,9 +65,9 @@ var items = [
 			return written;
 
 			function writeUInt(buffer, offset, value) {
-				return ((this.size === 4)
+				return ((size === 4)
 					? buffer.writeUInt32BE(value, offset)
-					: (this.size === 2)
+					: (size === 2)
 						? buffer.writeUInt16BE(value, offset)
 						: buffer.writeUInt8(value, offset)
 				) - offset;
