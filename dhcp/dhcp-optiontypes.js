@@ -51,15 +51,27 @@ var items = [
 				size = +this.size;
 
 			pos = offset + (written += (buffer.writeUInt8(+this.code, pos) - pos));
-			pos = offset + (written += (buffer.writeUInt8(size, pos) - pos));
-
-			pos = offset + (written += ((size === 4)
-				? buffer.writeUInt32BE(value, pos)
-				: (size === 2)
-					? buffer.writeUInt16BE(value, pos)
-					: buffer.writeUInt8(value, pos)) - pos);
+			if (value.length && 'function' === typeof value.forEach) {
+				pos = offset + (written += (buffer.writeUInt8(size * value.length, pos) - pos));
+				value.forEach((i) => {
+					pos = offset + (written += writeUInt.call(this, buffer, pos, i));
+				});
+			}
+			else {
+				pos = offset + (written += (buffer.writeUInt8(size, pos) - pos));
+				written += writeUInt.call(this, buffer, pos, value);
+			}
 			console.log('Setting DHCP Option: ' + this.key + '(' + value + ') - ' + written + 'B');
 			return written;
+
+			function writeUInt(buffer, offset, value) {
+				return ((this.size === 4)
+					? buffer.writeUInt32BE(value, offset)
+					: (this.size === 2)
+						? buffer.writeUInt16BE(value, offset)
+						: buffer.writeUInt8(value, offset)
+				) - offset;
+			}
 		}
 	},
 	{	name: 'ipaddress',
