@@ -29,6 +29,7 @@ function DHCPSClient(options) {
 	options.port = options.port || 68;
 
 	__super__.call(this, options);
+	this.destinationPort = 67;
 }
 
 __class__.prototype.start = function(callback) {

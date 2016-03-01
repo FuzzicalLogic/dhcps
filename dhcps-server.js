@@ -26,6 +26,7 @@ function DHCPSServer(options) {
 	options.port = options.port || 67;
 
 	__super__.call(this, options);
+	this.destinationPort = 68;
 }
 
 __class__.prototype.offer = function(discovery, options) {

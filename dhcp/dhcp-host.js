@@ -112,7 +112,7 @@ Object.defineProperties(__class__.prototype, {
 			this.socket.send(
 				packet,
 				0, packet.length,
-				67, __class__.SYSTEM_BROADCAST_ADDRESS,
+				this.destinationPort || 68, __class__.SYSTEM_BROADCAST_ADDRESS,
 				(error) => {
 					this.socket.setBroadcast(false);
 					if ('function' === typeof callback)
