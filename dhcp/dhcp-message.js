@@ -1,14 +1,15 @@
 "use strict";
-var __namespace__,
+var __namespace__, _protocol_,
 	Enum;
-module.exports = (namespace, EnumClass) => {
+module.exports = (namespace, EnumClass, protocol) => {
 	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
 	Enum = EnumClass;
+	_protocol_ = protocol;
+	//addOptions();
 
-
-	DHCPAMessage.TYPES = Object.freeze(new Enum()
+	DHCPSMessage.TYPES = Object.freeze(new Enum()
 		.add('DHCP_DISCOVER', 1)
 		.add('DHCP_OFFER', 2)
 		.add('DHCP_REQUEST', 3)
@@ -18,7 +19,7 @@ module.exports = (namespace, EnumClass) => {
 		.add('DHCP_RELEASE', 7)
 	);
 
-	return DHCPAMessage;
+	return DHCPSMessage;
 }
 var util = require('util'),
 	assert = require('assert'),
@@ -26,8 +27,8 @@ var util = require('util'),
 	V4Address = require('ip-address').Address4,
 	EventEmitter = require('events').EventEmitter;
 
-util.inherits(DHCPAMessage, EventEmitter);
-function DHCPAMessage(xid, msgtype) {
+util.inherits(DHCPSMessage, EventEmitter);
+function DHCPSMessage(xid, msgtype) {
 	EventEmitter.call(this);
 
 	this.xid = xid || 0x00000001;
@@ -60,7 +61,6 @@ function DHCPAMessage(xid, msgtype) {
 	});
 
 	this.on('chaddrChanged', (newValue, oldValue) => {
-		console.log('ChAddr has Changed: ' + newValue);
 		/*this.hw(new Buffer(newValue.split(':').map((part) => {
 	        return parseInt(part, 16);
 	    })));*/
@@ -69,14 +69,19 @@ function DHCPAMessage(xid, msgtype) {
         return parseInt(part, 16);
     }));*/
 
-	this.options = {
-
-	};
+	this.options = {};
+	this.options.dhcpMessageType = +msgtype;
 }
-DHCPAMessage.decode = decodePacket;
+DHCPSMessage.decode = decodePacket;
+DHCPSMessage.OPTIONS = {};
 
-//DHCPAMessage.prototype = Object.create(null);
-DHCPAMessage.prototype.encode = encodeMessage;
+//DHCPSMessage.prototype = Object.create(null);
+DHCPSMessage.prototype.encode = encodeMessage;
+DHCPSMessage.prototype.option = setOption;
+
+function setOption(option, value) {
+
+}
 
 function encodeMessage(packet) {
 
@@ -112,25 +117,11 @@ function encodeMessage(packet) {
     packet.fill(0, i, i + 192); i += 192;
     packet.writeUInt32BE(0x63825363, i); i += 4;
 
-    if ('requestedIpAddress' in this.options) {
-        packet.writeUInt8(50, i++); // option 50
-        var requestedIpAddress = new Buffer(
-            new v4.Address(this.options.requestedIpAddress).toArray());
-        packet.writeUInt8(requestedIpAddress.length, i++);
-        requestedIpAddress.copy(packet, i); i += requestedIpAddress.length;
-    }
-    if ('dhcpMessageType' in this.options) {
-        packet.writeUInt8(53, i++); // option 53
-        packet.writeUInt8(1, i++);  // length
-        packet.writeUInt8(this.options.dhcpMessageType, i++);
-    }
-    if ('serverIdentifier' in this.options) {
-        packet.writeUInt8(54, i++); // option 54
-        var serverIdentifier = new Buffer(
-            new v4.Address(this.options.serverIdentifier).toArray());
-        packet.writeUInt8(serverIdentifier.length, i++);
-        serverIdentifier.copy(packet, i); i += serverIdentifier.length;
-    }
+	Object.keys(this.options).forEach((opt) => {
+		if (opt in DHCPSMessage.OPTIONS)
+			i += DHCPSMessage.OPTIONS[opt].write(packet, i, this.options[opt]);
+	});
+
     if ('parameterRequestList' in this.options) {
         packet.writeUInt8(55, i++); // option 55
         var parameterRequestList = new Buffer(this.options.parameterRequestList);
@@ -170,10 +161,10 @@ function encodeMessage(packet) {
 }
 
 function decodePacket(packet, rinfo) {
-	var op = __namespace__.protocol.BOOTPMessageType.get(packet.readUInt8(0)),
+	var op = _protocol_.BOOTPMessageType.get(packet.readUInt8(0)),
 	    hlen = packet.readUInt8(2),
 		hops = packet.readUInt8(3),
-		msg = new DHCPAMessage(packet.readUInt32BE(4), DHCPAMessage.TYPES.DHCP_RELEASE);
+		msg = new DHCPSMessage(packet.readUInt32BE(4), DHCPSMessage.TYPES.DHCP_RELEASE);
 
 	msg.secs(packet.readUInt16BE(8))
 		  .flags(packet.readUInt16BE(10))
@@ -188,31 +179,21 @@ function decodePacket(packet, rinfo) {
 
 	msg.options = {};
 
-    /*var p = {
-        chaddr: __namespace__.protocol.createHardwareAddress(
-                    __namespace__.protocol.ARPHardwareType.get(packet.readUInt8(1)),
-                    readAddressRaw(packet, 28, packet.readUInt8(2))),
-    };
-	*/
-
     var offset = 240;
     var code = 0;
     while (code != 255 && offset < packet.length) {
         code = packet.readUInt8(offset++);
-        switch (code) {
+	// If the code is supported, it will have its own read function
+		if (DHCPSMessage.OPTIONS.hasOwnProperty(code)) {
+			var option = DHCPSMessage.OPTIONS[code],
+				data = option.read(packet, offset);
+			msg.options[option.key()] = data.value;
+			offset += data.length;
+			console.log('Option Found: ' + option.key + '(' + msg.options[option.key()]+ ')');
+		}
+		else switch (code) {
             case 0: continue;   // pad
             case 255: break;    // end
-            case 1: {           // subnetMask
-                offset = readIp(packet, offset, msg, 'subnetMask');
-                break;
-            }
-            case 2: {           // timeOffset
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 4);
-                msg.options.timeOffset = packet.readUInt32BE(offset);
-                offset += len;
-                break;
-            }
             case 3: {           // routerOption
                 var len = packet.readUInt8(offset++);
                 assert.strictEqual(len % 4, 0);
@@ -247,14 +228,6 @@ function decodePacket(packet, rinfo) {
                 }
                 break;
             }
-            case 12: {          // hostName
-                offset = readString(packet, offset, msg, 'hostName');
-                break;
-            }
-            case 15: {          // domainName
-                offset = readString(packet, offset, msg, 'domainName');
-                break;
-            }
             case 43: {          // vendorOptions
                 var len = packet.readUInt8(offset++);
                 msg.options.vendorOptions = {};
@@ -268,37 +241,6 @@ function decodePacket(packet, rinfo) {
                 }
                 break;
             }
-            case 50: {          // requestedIpAddress
-                offset = readIp(packet, offset, msg, 'requestedIpAddress');
-                break;
-            }
-            case 51: {          // ipAddressLeaseTime
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 4);
-                msg.options.ipAddressLeaseTime =
-                    packet.readUInt32BE(offset);
-                offset += 4;
-                break;
-            }
-            case 52: {          // optionOverload
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 1);
-                msg.options.optionOverload = packet.readUInt8(offset++);
-                break;
-            }
-            case 53: {          // dhcpMessageType
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 1);
-                var mtype = packet.readUInt8(offset++);
-                assert.ok(1 <= mtype);
-                assert.ok(8 >= mtype);
-                msg.options.dhcpMessageType = DHCPAMessage.TYPES.get(mtype);
-                break;
-            }
-            case 54: {          // serverIdentifier
-                offset = readIp(packet, offset, msg, 'serverIdentifier');
-                break;
-            }
             case 55: {          // parameterRequestList
                 var len = packet.readUInt8(offset++);
                 msg.options.parameterRequestList = [];
@@ -308,36 +250,11 @@ function decodePacket(packet, rinfo) {
                 }
                 break;
             }
-            case 57: {          // maximumMessageSize
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 2);
-                msg.options.maximumMessageSize = packet.readUInt16BE(offset);
-                offset += len;
-                break;
-            }
-            case 58: {          // renewalTimeValue
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 4);
-                msg.options.renewalTimeValue = packet.readUInt32BE(offset);
-                offset += len;
-                break;
-            }
-            case 59: {          // rebindingTimeValue
-                var len = packet.readUInt8(offset++);
-                assert.strictEqual(len, 4);
-                msg.options.rebindingTimeValue = packet.readUInt32BE(offset);
-                offset += len;
-                break;
-            }
-            case 60: {          // vendorClassIdentifier
-                offset = readString(packet, offset, msg, 'vendorClassIdentifier');
-                break;
-            }
             case 61: {          // clientIdentifier
                 var len = packet.readUInt8(offset++);
                 msg.options.clientIdentifier =
-                    __namespace__.protocol.createHardwareAddress(
-                        __namespace__.protocol.ARPHardwareType.get(packet.readUInt8(offset)),
+                    _protocol_.createHardwareAddress(
+                        _protocol_.ARPHardwareType.get(packet.readUInt8(offset)),
                         readAddressRaw(packet, offset + 1, len - 1));
                 offset += len;
                 break;
@@ -349,10 +266,6 @@ function decodePacket(packet, rinfo) {
                     name: packet.toString('ascii', offset + 3, offset + len)
                 };
                 offset += len;
-                break;
-            }
-            case 118: {		    // subnetSelection
-                offset = readIp(packet, offset, msg, 'subnetAddress');
                 break;
             }
             default: {
@@ -402,30 +315,3 @@ function readAddressRaw(buffer, offset, len) {
 	}
 	return addr;
 }
-
-
-/*
-function readIP(msg, offset, obj, name) {
-
-}
-
-function readRawIP(msg, offset) {
-	return [0,0,0,0]
-		.map(() => { return msg.readUInt8(offset++) })
-		.join('.');
-}
-
-function readAddressRaw(msg, offset, len) {
-	var addr = [];
-	while (len-- > 0) {
-		addr.push(msg.readUInt8(offset++));
-	}
-	return addr.map((v) => {
-		return (v + 0x100).toString(16).substr(-2);
-	}).join(':')
-}
-
-function trimNulls(str) {
-	return str.replace(/\u0000+/, '');
-}
-*/
