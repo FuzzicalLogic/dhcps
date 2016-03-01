@@ -33,7 +33,7 @@ function DHCPSClient(options) {
 }
 
 __class__.prototype.start = function(callback) {
-	var packet = this.discover(1);
+	var packet = this.discover(1).encode(new Buffer(1500));
 	__super__.prototype.start.call(this, () => {
 		this.broadcast(packet, () => {
 			console.log('DHCPS Client: Broadcast sent');

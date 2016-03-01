@@ -1,10 +1,14 @@
 "use strict";
 var __class__ = DHCPHost,
-	__namespace__;
+	__namespace__,
+	Message, MSGTYPES;
+
 module.exports = (namespace) => {
 	__namespace__ = 'object' === typeof namespace
 		? namespace
 		: Object.create(null);
+	Message = __namespace__.Message;
+	MSGTYPES = Message.TYPES;
 
 	return DHCPHost;
 }
@@ -56,22 +60,24 @@ function DHCPHost(opts) {
 	});
 
     this.socket = dgram.createSocket('udp4');
-    this.socket.on('message', (pkt, rinfo) => {
-		var msg = __namespace__.Message.decode(pkt, rinfo);
-    	this.emit('message', rinfo, msg);
-
-		console.log('DHCP/A Message received from: ' + rinfo.address + ':' + rinfo.port );
-		var type = __namespace__.Message.TYPES.get(msg.options.dhcpMessageType);
-		if (!!type) {
-			var event = type.name.toLowerCase().replace('dhcp_', '');
-			this.emit(event, rinfo, msg);
-		}
-		else this.emit('unhandled', rinfo, msg);
-    });
     this.socket.on('listening', () => {
         var address = this.socket.address();
         this.emit('listening', address.address + ':' + address.port);
     });
+	this.socket.on('message', (pkt, rinfo) => {
+		console.log('DHCP/S Message recieved on: ' + this.address);
+		var msg = Message.decode(pkt, rinfo);
+		this.emit('message', rinfo, msg);
+
+		console.log('DHCP/A Message received from: ' + rinfo.address + ':' + rinfo.port );
+		var type = MSGTYPES.get(msg.options.dhcpMessageType);
+		if (!!type) {
+			var event = type.name.toLowerCase().replace('dhcp_', '');
+			console.log('DHCP/A Event firing: ' + event);
+			this.emit(event, rinfo, msg);
+		}
+		else this.emit('unhandled', rinfo, msg);
+	});
 }
 
 Object.defineProperties(__class__, {
@@ -96,13 +102,12 @@ Object.defineProperties(__class__.prototype, {
 	},
 	createMessage: {
 		value: function(xid, type, opts) {
-			var pkt = new Buffer(1500),
-				msg = new __namespace__.Message(xid, type);
+			var msg = new __namespace__.Message(xid, type);
 
 			Object.keys(opts).forEach((key) => {
 				msg.options[key] = opts[key];
 			});
-			return msg.encode(pkt);
+			return msg;
 		}
 	},
 	broadcast: {
