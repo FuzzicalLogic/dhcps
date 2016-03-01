@@ -117,7 +117,9 @@ Object.defineProperties(__class__.prototype, {
 			this.socket.send(
 				packet,
 				0, packet.length,
-				this.destinationPort || 68, __class__.SYSTEM_BROADCAST_ADDRESS,
+			// RFC 2131 4.1
+				this.destinationPort || 68, 
+				__class__.SYSTEM_BROADCAST_ADDRESS,
 				(error) => {
 					this.socket.setBroadcast(false);
 					if ('function' === typeof callback)

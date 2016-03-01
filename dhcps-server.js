@@ -26,11 +26,20 @@ function DHCPSServer(options) {
 	options.port = options.port || 67;
 
 	__super__.call(this, options);
+// RFC 2131 4.1
 	this.destinationPort = 68;
+	this.leaseDuration = 86400;
 }
 
 __class__.prototype.offer = function(discovery, options) {
-	return this.createMessage(discovery.xid, +MSGTYPES.DHCP_OFFER, options || {});
+	var cfg = options || {};
+// RFC 2132 9.2
+	cfg.ipAddressLeaseTime = cfg.ipAddressLeaseTime || this.leaseDuration;
+
+	var msg = this.createMessage(discovery.xid, +MSGTYPES.DHCP_OFFER, cfg);
+// RFC 2131 2
+	msg.siaddr(''+this.address);
+	return msg;
 }
 __class__.prototype.ack = function(request, options) {
 	return this.createMessage(request.xid, +MSGTYPES.DHCP_ACK, options || {});

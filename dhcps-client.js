@@ -29,6 +29,7 @@ function DHCPSClient(options) {
 	options.port = options.port || 68;
 
 	__super__.call(this, options);
+// RFC 2131 4.1
 	this.destinationPort = 67;
 }
 

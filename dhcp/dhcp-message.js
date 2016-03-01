@@ -156,7 +156,6 @@ function encodeMessage(packet) {
         packet.fill(0, i, i + remaining); i+= remaining;
     }
 
-    //console.log('createPacket:', i, 'bytes');
     return packet.slice(0, i);
 }
 
