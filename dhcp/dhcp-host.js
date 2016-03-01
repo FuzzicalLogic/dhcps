@@ -1,5 +1,6 @@
 "use strict";
-var __namespace__;
+var __class__ = DHCPHost,
+	__namespace__;
 module.exports = (namespace) => {
 	__namespace__ = 'object' === typeof namespace
 		? namespace
@@ -51,7 +52,7 @@ function DHCPHost(opts) {
 	});
 
 	this.on('addressChanged', () => {
-		console.log('DHCP Host\'s address has changed');
+
 	});
 
     this.socket = dgram.createSocket('udp4');
@@ -73,52 +74,62 @@ function DHCPHost(opts) {
     });
 }
 
-Object.defineProperties(DHCPHost, {
+Object.defineProperties(__class__, {
 	SYSTEM_BROADCAST_ADDRESS: { value: '127.255.255.255' },
 	LOCALAREA_BROADCAST_ADDRESS: { value: '192.255.255.255' },
 });
 
-Object.defineProperties(DHCPHost.prototype, {
-	start: { value: startServer },
-	send: { value: sendMessage },
-	broadcast: { value: broadcastPacket },
-	close: { value: closeServer }
-});
-
-DHCPHost.prototype.bind = function(callback) {
-    this.socket.bind(this.port(), this.address(), () => {
-    	this.socket.setBroadcast(true);
-		if ('function' === typeof callback)
-			process.nextTick(callback);
-    });
-}
-
-function startServer(callback) {
-	this.bind(callback);
-}
-
-function broadcastPacket(packet, callback) {
-	//var pack = this.createPacket(msg);
-	this.socket.setBroadcast(true);
-	this.socket.send(
-		packet,
-		0, packet.length,
-		67, DHCPHost.SYSTEM_BROADCAST_ADDRESS,
-		(error) => {
-			this.socket.setBroadcast(false);
-			if ('function' === typeof callback)
-				process.nextTick(callback, error);
+Object.defineProperties(__class__.prototype, {
+	bind: {
+		value: function(callback) {
+		    this.socket.bind(this.port(), this.address(), () => {
+		    	this.socket.setBroadcast(true);
+				if ('function' === typeof callback)
+					process.nextTick(callback);
+		    });
 		}
-	);
-}
+	},
+	start: {
+		value: function(callback) {
+			this.bind(callback);
+		}
+	},
+	createMessage: {
+		value: function(xid, type, opts) {
+			var pkt = new Buffer(1500),
+				msg = new __namespace__.Message(xid, type);
 
-function sendMessage(msg, host, port, cb) {
-	console.log('Sending Message to: ' + host + ':' + port);
-
-	var packet = msg.encode();
-	this.socket.send(packet, 0, packet.length, port, host, cb);
-}
-
-function closeServer() {
-	this.socket.close();
-}
+			Object.keys(opts).forEach((key) => {
+				msg.options[key] = opts[key];
+			});
+			return msg.encode(pkt);
+		}
+	},
+	broadcast: {
+		value: function(packet, callback) {
+			//var pack = this.createPacket(msg);
+			this.socket.setBroadcast(true);
+			this.socket.send(
+				packet,
+				0, packet.length,
+				67, __class__.SYSTEM_BROADCAST_ADDRESS,
+				(error) => {
+					this.socket.setBroadcast(false);
+					if ('function' === typeof callback)
+						process.nextTick(callback, error);
+				}
+			);
+		}
+	},
+	send: {
+		value: function(msg, host, port, cb) {
+			var packet = msg.encode();
+			this.socket.send(packet, 0, packet.length, port, host, cb);
+		}
+	},
+	close: {
+		value: function() {
+			this.socket.close();
+		}
+	}
+});

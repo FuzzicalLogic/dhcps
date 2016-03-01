@@ -61,7 +61,6 @@ function DHCPSMessage(xid, msgtype) {
 	});
 
 	this.on('chaddrChanged', (newValue, oldValue) => {
-		console.log('ChAddr has Changed: ' + newValue);
 		/*this.hw(new Buffer(newValue.split(':').map((part) => {
 	        return parseInt(part, 16);
 	    })));*/
@@ -78,6 +77,11 @@ DHCPSMessage.OPTIONS = {};
 
 //DHCPSMessage.prototype = Object.create(null);
 DHCPSMessage.prototype.encode = encodeMessage;
+DHCPSMessage.prototype.option = setOption;
+
+function setOption(option, value) {
+
+}
 
 function encodeMessage(packet) {
 
@@ -113,31 +117,11 @@ function encodeMessage(packet) {
     packet.fill(0, i, i + 192); i += 192;
     packet.writeUInt32BE(0x63825363, i); i += 4;
 
-    if ('requestedIpAddress' in this.options) {
-        packet.writeUInt8(50, i++); // option 50
-        var requestedIpAddress = new Buffer(
-            new v4.Address(this.options.requestedIpAddress).toArray());
-        packet.writeUInt8(requestedIpAddress.length, i++);
-        requestedIpAddress.copy(packet, i); i += requestedIpAddress.length;
-    }
-	if ('timeOffset' in this.options) {
-		packet.writeUInt8(2, i++);
-        packet.writeUInt8(4, i++); // option 50
-        packet.writeUInt32BE(this.options.timeOffset, i);
-		i += 4;
-    }
-    if ('dhcpMessageType' in this.options) {
-        packet.writeUInt8(53, i++); // option 53
-        packet.writeUInt8(1, i++);  // length
-        packet.writeUInt8(this.options.dhcpMessageType, i++);
-    }
-    if ('serverIdentifier' in this.options) {
-        packet.writeUInt8(54, i++); // option 54
-        var serverIdentifier = new Buffer(
-            new v4.Address(this.options.serverIdentifier).toArray());
-        packet.writeUInt8(serverIdentifier.length, i++);
-        serverIdentifier.copy(packet, i); i += serverIdentifier.length;
-    }
+	Object.keys(this.options).forEach((opt) => {
+		if (opt in DHCPSMessage.OPTIONS)
+			i += DHCPSMessage.OPTIONS[opt].write(packet, i, this.options[opt]);
+	});
+
     if ('parameterRequestList' in this.options) {
         packet.writeUInt8(55, i++); // option 55
         var parameterRequestList = new Buffer(this.options.parameterRequestList);
@@ -195,30 +179,21 @@ function decodePacket(packet, rinfo) {
 
 	msg.options = {};
 
-    /*var p = {
-        chaddr: __namespace__.protocol.createHardwareAddress(
-                    __namespace__.protocol.ARPHardwareType.get(packet.readUInt8(1)),
-                    readAddressRaw(packet, 28, packet.readUInt8(2))),
-    };
-	*/
-
     var offset = 240;
     var code = 0;
     while (code != 255 && offset < packet.length) {
         code = packet.readUInt8(offset++);
+	// If the code is supported, it will have its own read function
 		if (DHCPSMessage.OPTIONS.hasOwnProperty(code)) {
-			var option = DHCPSMessage.OPTIONS[code];
-			msg.options[option.key()] = option.read(packet, offset);
-			offset += option.size();
+			var option = DHCPSMessage.OPTIONS[code],
+				data = option.read(packet, offset);
+			msg.options[option.key()] = data.value;
+			offset += data.length;
 			console.log('Option Found: ' + option.key + '(' + msg.options[option.key()]+ ')');
 		}
 		else switch (code) {
             case 0: continue;   // pad
             case 255: break;    // end
-            case 1: {           // subnetMask
-                offset = readIp(packet, offset, msg, 'subnetMask');
-                break;
-            }
             case 3: {           // routerOption
                 var len = packet.readUInt8(offset++);
                 assert.strictEqual(len % 4, 0);
@@ -253,14 +228,6 @@ function decodePacket(packet, rinfo) {
                 }
                 break;
             }
-            case 12: {          // hostName
-                offset = readString(packet, offset, msg, 'hostName');
-                break;
-            }
-            case 15: {          // domainName
-                offset = readString(packet, offset, msg, 'domainName');
-                break;
-            }
             case 43: {          // vendorOptions
                 var len = packet.readUInt8(offset++);
                 msg.options.vendorOptions = {};
@@ -274,14 +241,6 @@ function decodePacket(packet, rinfo) {
                 }
                 break;
             }
-            case 50: {          // requestedIpAddress
-                offset = readIp(packet, offset, msg, 'requestedIpAddress');
-                break;
-            }
-            case 54: {          // serverIdentifier
-                offset = readIp(packet, offset, msg, 'serverIdentifier');
-                break;
-            }
             case 55: {          // parameterRequestList
                 var len = packet.readUInt8(offset++);
                 msg.options.parameterRequestList = [];
@@ -289,10 +248,6 @@ function decodePacket(packet, rinfo) {
                     var option = packet.readUInt8(offset++);
                     msg.options.parameterRequestList.push(option);
                 }
-                break;
-            }
-            case 60: {          // vendorClassIdentifier
-                offset = readString(packet, offset, msg, 'vendorClassIdentifier');
                 break;
             }
             case 61: {          // clientIdentifier
@@ -311,10 +266,6 @@ function decodePacket(packet, rinfo) {
                     name: packet.toString('ascii', offset + 3, offset + len)
                 };
                 offset += len;
-                break;
-            }
-            case 118: {		    // subnetSelection
-                offset = readIp(packet, offset, msg, 'subnetAddress');
                 break;
             }
             default: {

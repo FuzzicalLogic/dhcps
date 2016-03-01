@@ -1,5 +1,6 @@
 "use strict";
-var __namespace__, __super__, Message, MSGTYPES;
+var __class__ = DHCPSServer,
+	__namespace__, __super__, Message, MSGTYPES;
 
 module.exports = (namespace, ParentClass) => {
 	__namespace__ = 'object' === typeof namespace
@@ -27,20 +28,12 @@ function DHCPSServer(options) {
 	__super__.call(this, options);
 }
 
-DHCPSServer.prototype.offer = function(discovery) {
-	var msg = new Message(discovery.xid, +MSGTYPES.DHCP_OFFER),
-		pkt = new Buffer(1500);
-	return msg.encode(pkt);
+__class__.prototype.offer = function(discovery, options) {
+	return this.createMessage(discovery.xid, +MSGTYPES.DHCP_OFFER, options || {});
 }
-
-DHCPSServer.prototype.ack = function(request) {
-	var msg = new Message(request.xid, +MSGTYPES.DHCP_ACK),
-		pkt = new Buffer(1500);
-	return msg.encode(pkt);
+__class__.prototype.ack = function(request, options) {
+	return this.createMessage(request.xid, +MSGTYPES.DHCP_ACK, options || {});
 }
-
-DHCPSServer.prototype.nak = function(request) {
-	var msg = new Message(request.xid, +MSGTYPES.DHCP_NAK),
-		pkt = new Buffer(1500);
-	return msg.encode(pkt);
+__class__.prototype.nak = function(request, options) {
+	return this.createMessage(request.xid, +MSGTYPES.DHCP_NAK, options || {});
 }
