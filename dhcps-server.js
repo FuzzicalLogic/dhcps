@@ -61,7 +61,9 @@ __class__.prototype.ack = function(request, options) {
 // RFC 2132 3.17
 	cfg.domainName = cfg.domainName || this.domainName;
 
-	return this.createMessage(request.xid, +MSGTYPES.DHCP_ACK, cfg);
+	var msg = this.createMessage(request.xid, +MSGTYPES.DHCP_ACK, cfg);
+	msg.siaddr(''+this.address);
+	return msg;
 }
 __class__.prototype.nak = function(request, options) {
 	return this.createMessage(request.xid, +MSGTYPES.DHCP_NAK, options || {});
