@@ -50,7 +50,6 @@ function DHCPOption(key, value, size, fnRead, fnWrite, type) {
 		};
 }
 DHCPOption.prototype.readLength = function(buffer, offset) {
-	console.log('Length at: ' + offset.toString(16));
 	return buffer.readUInt8(offset);
 };
 DHCPOption.TYPES = {}

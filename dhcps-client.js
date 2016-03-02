@@ -21,6 +21,8 @@ module.exports = (namespace, ParentClass) => {
 var util = require('util');
 var V4Address = require('ip-address').Address4;
 var hex = require('hex');
+var ALLOWED_MESSAGES = [ 'discover', 'offer', 'ack', 'nak', 'inform' ];
+
 
 function DHCPSClient(options) {
 	options = options || { };
@@ -31,6 +33,15 @@ function DHCPSClient(options) {
 	__super__.call(this, options);
 // RFC 2131 4.1
 	this.destinationPort = 67;
+
+	this.socket.on('dhcpmessage', (from, message) => {
+		var type = MSGTYPES.get(message.options.dhcpMessageType),
+			event = type.name.toLowerCase().replace('dhcp_', '');
+
+		event = ALLOWED_MESSAGES.indexOf(event) > -1 ? event : 'unhandled';
+		console.log('[DHCP/S] ' + type.name + ': ' + this.address);
+		this.emit(event, message);
+	});
 }
 
 __class__.prototype.start = function(callback) {

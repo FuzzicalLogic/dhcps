@@ -65,18 +65,8 @@ function DHCPHost(opts) {
         this.emit('listening', address.address + ':' + address.port);
     });
 	this.socket.on('message', (pkt, rinfo) => {
-		console.log('DHCP/S Message recieved on: ' + this.address);
 		var msg = Message.decode(pkt, rinfo);
-		this.emit('message', rinfo, msg);
-
-		console.log('DHCP/A Message received from: ' + rinfo.address + ':' + rinfo.port );
-		var type = MSGTYPES.get(msg.options.dhcpMessageType);
-		if (!!type) {
-			var event = type.name.toLowerCase().replace('dhcp_', '');
-			console.log('DHCP/A Event firing: ' + event);
-			this.emit(event, rinfo, msg);
-		}
-		else this.emit('unhandled', rinfo, msg);
+		this.socket.emit('dhcpmessage', rinfo, msg);
 	});
 }
 
@@ -118,7 +108,7 @@ Object.defineProperties(__class__.prototype, {
 				packet,
 				0, packet.length,
 			// RFC 2131 4.1
-				this.destinationPort || 68, 
+				this.destinationPort || 68,
 				__class__.SYSTEM_BROADCAST_ADDRESS,
 				(error) => {
 					this.socket.setBroadcast(false);

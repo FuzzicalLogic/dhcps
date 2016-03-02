@@ -18,6 +18,7 @@ module.exports = (namespace, ParentClass) => {
 }
 
 var util = require('util');
+var ALLOWED_MESSAGES = [ 'discover', 'request', 'decline', 'release', 'inform' ];
 
 function DHCPSServer(options) {
 	options = options || { };
@@ -29,12 +30,26 @@ function DHCPSServer(options) {
 // RFC 2131 4.1
 	this.destinationPort = 68;
 	this.leaseDuration = 86400;
+	this.domainName = 'ntmobiledev.local';
+
+	this.socket.on('dhcpmessage', (from, message) => {
+		var type = MSGTYPES.get(message.options.dhcpMessageType),
+			event = type.name.toLowerCase().replace('dhcp_', '');
+
+		event = ALLOWED_MESSAGES.indexOf(event) > -1 ? event : 'unhandled';
+		console.log('[DHCP/S] ' + type.name + ': ' + this.address);
+		this.emit(event, message);
+	});
 }
 
 __class__.prototype.offer = function(discovery, options) {
 	var cfg = options || {};
 // RFC 2132 9.2
 	cfg.ipAddressLeaseTime = cfg.ipAddressLeaseTime || this.leaseDuration;
+// RFC 2132 3.14
+	cfg.hostName = this.domainName;
+// RFC 2132 9.7
+	cfg.serverIdentifier = ''+this.address;
 
 	var msg = this.createMessage(discovery.xid, +MSGTYPES.DHCP_OFFER, cfg);
 // RFC 2131 2
@@ -42,7 +57,11 @@ __class__.prototype.offer = function(discovery, options) {
 	return msg;
 }
 __class__.prototype.ack = function(request, options) {
-	return this.createMessage(request.xid, +MSGTYPES.DHCP_ACK, options || {});
+	var cfg = options || {};
+// RFC 2132 3.17
+	cfg.domainName = cfg.domainName || this.domainName;
+
+	return this.createMessage(request.xid, +MSGTYPES.DHCP_ACK, cfg);
 }
 __class__.prototype.nak = function(request, options) {
 	return this.createMessage(request.xid, +MSGTYPES.DHCP_NAK, options || {});
