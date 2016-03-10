@@ -1,6 +1,13 @@
 "use strict";
+var DHCPSMessage;
 var __namespace__, _protocol_,
 	Enum;
+
+var assert = require('assert'),
+	attribute = require('attribute'),
+	V4Address = require('ip-address').Address4,
+	EventEmitter = require('events').EventEmitter;
+
 module.exports = (namespace, EnumClass, protocol) => {
 	__namespace__ = 'object' === typeof namespace
 		? namespace
@@ -9,6 +16,57 @@ module.exports = (namespace, EnumClass, protocol) => {
 	_protocol_ = protocol;
 	//addOptions();
 
+	DHCPSMessage = class __class__ extends EventEmitter {
+		constructor(xid, msgtype) {
+			super();
+
+			this.xid = xid || 0x00000001;
+
+			var config = {
+				op : { initial: 0x01, validator: () => { return true;} },
+				chaddr: {
+					initial: '01:02:03:04:05:06',
+					onChange: 'chaddrChanged',
+					validator: (v) => {
+						return v === ''+v;
+					}
+				},
+				htype: { initial: 0x01, validator: (v) => { return 'number' === typeof v;} },
+				hlen: { initial: 0x06, validator: (v) => { return 'number' === typeof v;} },
+				hops: { initial: 0x00, validator: (v) => { return 'number' === typeof v;} },
+				secs: { initial: 0x0000, validator: (v) => { return 'number' === typeof v;} },
+				flags: { initial: 0x0000, validator: (v) => { return 'number' === typeof v;} },
+				ciaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
+				yiaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
+				siaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
+				giaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
+				sname: { initial: '', validator: (v) => { return 'string' === typeof v;} },
+				file: { initial: '', validator: (v) => { return 'string' === typeof v;} },
+			// RFC2131 - Magic Cookie
+				magic: { initial: '', validator: (v) => { return v === 0x63825363; } },
+			};
+			Object.keys(config).forEach((key) => {
+				attribute(this, key, config[key]);
+			});
+
+			this.on('chaddrChanged', (newValue, oldValue) => {
+				/*this.hw(new Buffer(newValue.split(':').map((part) => {
+			        return parseInt(part, 16);
+			    })));*/
+			});
+			/*this.hw = new Buffer(pkt.chaddr.split(':').map(function(part) {
+		        return parseInt(part, 16);
+		    }));*/
+
+			this.options = {};
+			this.options.dhcpMessageType = +msgtype;
+		}
+		static get decode() { return decodePacket; }
+
+		get encode() { return encodeMessage; }
+		get option() { return setOption; }
+	}
+	DHCPSMessage.OPTIONS = {};
 	DHCPSMessage.TYPES = Object.freeze(new Enum()
 		.add('DHCP_DISCOVER', 1)
 		.add('DHCP_OFFER', 2)
@@ -21,63 +79,6 @@ module.exports = (namespace, EnumClass, protocol) => {
 
 	return DHCPSMessage;
 }
-var util = require('util'),
-	assert = require('assert'),
-	attribute = require('attribute'),
-	V4Address = require('ip-address').Address4,
-	EventEmitter = require('events').EventEmitter;
-
-util.inherits(DHCPSMessage, EventEmitter);
-function DHCPSMessage(xid, msgtype) {
-	EventEmitter.call(this);
-
-	this.xid = xid || 0x00000001;
-
-	var config = {
-		op : { initial: 0x01, validator: () => { return true;} },
-		chaddr: {
-			initial: '01:02:03:04:05:06',
-			onChange: 'chaddrChanged',
-			validator: (v) => {
-				return v === ''+v;
-			}
-		},
-		htype: { initial: 0x01, validator: (v) => { return 'number' === typeof v;} },
-		hlen: { initial: 0x06, validator: (v) => { return 'number' === typeof v;} },
-		hops: { initial: 0x00, validator: (v) => { return 'number' === typeof v;} },
-		secs: { initial: 0x0000, validator: (v) => { return 'number' === typeof v;} },
-		flags: { initial: 0x0000, validator: (v) => { return 'number' === typeof v;} },
-		ciaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
-		yiaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
-		siaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
-		giaddr: { initial: '0.0.0.0', validator: (v) => { return 'string' === typeof v;} },
-		sname: { initial: '', validator: (v) => { return 'string' === typeof v;} },
-		file: { initial: '', validator: (v) => { return 'string' === typeof v;} },
-	// RFC2131 - Magic Cookie
-		magic: { initial: '', validator: (v) => { return v === 0x63825363; } },
-	};
-	Object.keys(config).forEach((key) => {
-		attribute(this, key, config[key]);
-	});
-
-	this.on('chaddrChanged', (newValue, oldValue) => {
-		/*this.hw(new Buffer(newValue.split(':').map((part) => {
-	        return parseInt(part, 16);
-	    })));*/
-	});
-	/*this.hw = new Buffer(pkt.chaddr.split(':').map(function(part) {
-        return parseInt(part, 16);
-    }));*/
-
-	this.options = {};
-	this.options.dhcpMessageType = +msgtype;
-}
-DHCPSMessage.decode = decodePacket;
-DHCPSMessage.OPTIONS = {};
-
-//DHCPSMessage.prototype = Object.create(null);
-DHCPSMessage.prototype.encode = encodeMessage;
-DHCPSMessage.prototype.option = setOption;
 
 function setOption(option, value) {
 
